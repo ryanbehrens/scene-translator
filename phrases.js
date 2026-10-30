@@ -1,0 +1,166 @@
+/* Scene Translator — built-in EMS phrasebook
+ * Column order for every phrase: English, Spanish, Chinese (Mandarin, Simplified), Vietnamese, Tagalog, Arabic, Russian
+ * Answer types: yn = Yes/No/Don't know buttons, scale = 0–10 pain scale, open = spoken answer,
+ *               point = patient points (optional spoken answer), instr = instruction (no answer)
+ * IMPORTANT: Have every translation reviewed by a qualified medical interpreter before field use.
+ */
+const CURATED = ['es', 'zh', 'vi', 'tl', 'ar', 'ru'];
+function P(tag, type, en, ...tr) { const o = { tag, type, en }; CURATED.forEach((c, i) => (o[c] = tr[i])); return o; }
+
+const UI_TR = {
+  yes:    { en: 'Yes', es: 'Sí', zh: '是', vi: 'Có', tl: 'Oo', ar: 'نعم', ru: 'Да' },
+  no:     { en: 'No', es: 'No', zh: '不是', vi: 'Không', tl: 'Hindi', ar: 'لا', ru: 'Нет' },
+  unsure: { en: "I don't know", es: 'No sé', zh: '不知道', vi: 'Không biết', tl: 'Hindi ko alam', ar: 'لا أعرف', ru: 'Не знаю' },
+  nopain: { en: 'No pain', es: 'Sin dolor', zh: '不疼', vi: 'Không đau', tl: 'Walang sakit', ar: 'لا ألم', ru: 'Нет боли' },
+  worst:  { en: 'Worst pain', es: 'El peor dolor', zh: '最疼', vi: 'Đau nhất', tl: 'Pinakamasakit', ar: 'أشد ألم', ru: 'Сильнейшая боль' },
+  speak:  { en: 'Please speak now', es: 'Hable ahora, por favor', zh: '请现在说', vi: 'Hãy nói bây giờ', tl: 'Magsalita na po', ar: 'تكلّم الآن من فضلك', ru: 'Говорите, пожалуйста' },
+};
+
+const BLOOD_THINNERS = P('', 'yn', 'Do you take blood thinners?',
+  '¿Toma anticoagulantes (medicina para adelgazar la sangre)?', '您在服用抗凝血药（稀释血液的药）吗？',
+  'Bạn có dùng thuốc chống đông máu (thuốc làm loãng máu) không?', 'Umiinom po ba kayo ng pampalabnaw ng dugo (blood thinner)?',
+  'هل تتناول أدوية مميعة للدم؟', 'Вы принимаете препараты для разжижения крови?');
+
+const CATEGORIES = [
+  { id: 'basics', name: 'Start / Basics', phrases: [
+    P('', 'instr', 'Hello. We are paramedics. We are here to help you.', 'Hola. Somos paramédicos. Estamos aquí para ayudarle.', '您好。我们是急救人员。我们是来帮助您的。', 'Xin chào. Chúng tôi là nhân viên cấp cứu. Chúng tôi đến để giúp bạn.', 'Magandang araw po. Kami ay mga paramediko. Nandito kami para tulungan kayo.', 'مرحباً. نحن مسعفون. نحن هنا لمساعدتك.', 'Здравствуйте. Мы — скорая помощь. Мы здесь, чтобы помочь вам.'),
+    P('', 'instr', 'I am using this phone to translate.', 'Estoy usando este teléfono para traducir.', '我正在用这部手机翻译。', 'Tôi đang dùng điện thoại này để dịch.', 'Gumagamit po ako ng teleponong ito para magsalin.', 'أنا أستخدم هذا الهاتف للترجمة.', 'Я использую этот телефон для перевода.'),
+    P('', 'instr', 'Please answer by tapping the screen, or nod yes or no.', 'Por favor, responda tocando la pantalla, o diga sí o no con la cabeza.', '请点击屏幕回答，或者点头或摇头。', 'Vui lòng trả lời bằng cách chạm vào màn hình, hoặc gật đầu hay lắc đầu.', 'Pakisagot po sa pamamagitan ng pagpindot sa screen, o tumango o umiling.', 'من فضلك أجب بالضغط على الشاشة، أو بهزّ رأسك بنعم أو لا.', 'Пожалуйста, отвечайте, нажимая на экран, или кивните «да» или «нет».'),
+    P('', 'yn', 'Do you understand me?', '¿Me entiende?', '您听得懂吗？', 'Bạn có hiểu tôi không?', 'Naiintindihan po ba ninyo ako?', 'هل تفهمني؟', 'Вы меня понимаете?'),
+    P('', 'open', 'What is your name?', '¿Cómo se llama?', '您叫什么名字？', 'Bạn tên là gì?', 'Ano po ang pangalan ninyo?', 'ما اسمك؟', 'Как вас зовут?'),
+    P('', 'open', 'How old are you?', '¿Cuántos años tiene?', '您多大年纪？', 'Bạn bao nhiêu tuổi?', 'Ilang taon na po kayo?', 'كم عمرك؟', 'Сколько вам лет?'),
+    P('', 'yn', 'Is there someone here who speaks English?', '¿Hay alguien aquí que hable inglés?', '这里有人会说英语吗？', 'Ở đây có ai nói được tiếng Anh không?', 'May tao po ba rito na marunong mag-Ingles?', 'هل يوجد أحد هنا يتكلم الإنجليزية؟', 'Здесь есть кто-нибудь, кто говорит по-английски?'),
+    P('', 'yn', 'May we examine and treat you?', '¿Podemos examinarle y atenderle?', '我们可以为您检查和治疗吗？', 'Chúng tôi có thể khám và điều trị cho bạn không?', 'Maaari po ba namin kayong suriin at gamutin?', 'هل تسمح لنا بفحصك وعلاجك؟', 'Можно нам вас осмотреть и оказать помощь?'),
+    P('', 'point', 'Where does it hurt? Point to it.', '¿Dónde le duele? Señálelo.', '哪里疼？请指给我看。', 'Bạn đau ở đâu? Hãy chỉ cho tôi.', 'Saan po masakit? Ituro po ninyo.', 'أين يؤلمك؟ أشر إلى المكان.', 'Где болит? Покажите, пожалуйста.'),
+    P('', 'yn', 'Is anyone else hurt?', '¿Hay alguien más herido?', '还有其他人受伤吗？', 'Có ai khác bị thương không?', 'May iba pa po bang nasaktan?', 'هل هناك شخص آخر مصاب؟', 'Кто-нибудь ещё пострадал?'),
+    P('', 'instr', 'Stay still. Do not move.', 'Quédese quieto. No se mueva.', '请保持不动。不要动。', 'Hãy giữ yên. Đừng cử động.', 'Huwag po kayong gumalaw. Manatili lang po kayo.', 'ابقَ ثابتاً. لا تتحرك.', 'Не двигайтесь, пожалуйста.'),
+    P('', 'instr', 'We are going to check your blood pressure.', 'Vamos a tomarle la presión.', '我们要给您量血压。', 'Chúng tôi sẽ đo huyết áp cho bạn.', 'Kukunin po namin ang blood pressure ninyo.', 'سنقيس ضغط دمك.', 'Сейчас мы измерим вам давление.'),
+    P('', 'yn', 'Do you want to go to the hospital?', '¿Quiere ir al hospital?', '您想去医院吗？', 'Bạn có muốn đến bệnh viện không?', 'Gusto po ba ninyong pumunta sa ospital?', 'هل تريد الذهاب إلى المستشفى؟', 'Вы хотите поехать в больницу?'),
+    P('', 'instr', 'We are taking you to the hospital.', 'Le vamos a llevar al hospital.', '我们要送您去医院。', 'Chúng tôi sẽ đưa bạn đến bệnh viện.', 'Dadalhin po namin kayo sa ospital.', 'سننقلك إلى المستشفى.', 'Мы отвезём вас в больницу.'),
+  ]},
+
+  { id: 'opqrst', name: 'OPQRST – Pain assessment', phrases: [
+    P('O', 'open', 'When did it start?', '¿Cuándo empezó?', '什么时候开始的？', 'Nó bắt đầu khi nào?', 'Kailan po ito nagsimula?', 'متى بدأ؟', 'Когда это началось?'),
+    P('O', 'open', 'What were you doing when it started?', '¿Qué estaba haciendo cuando empezó?', '开始的时候您在做什么？', 'Bạn đang làm gì khi nó bắt đầu?', 'Ano po ang ginagawa ninyo nang magsimula ito?', 'ماذا كنت تفعل عندما بدأ؟', 'Что вы делали, когда это началось?'),
+    P('O', 'yn', 'Did it start suddenly?', '¿Empezó de repente?', '是突然开始的吗？', 'Nó có bắt đầu đột ngột không?', 'Bigla po ba itong nagsimula?', 'هل بدأ فجأة؟', 'Это началось внезапно?'),
+    P('P', 'yn', 'Does anything make it better?', '¿Hay algo que lo mejore?', '有什么能让它好一点吗？', 'Có điều gì làm nó đỡ hơn không?', 'May nakapagpapagaan po ba nito?', 'هل هناك شيء يجعله أفضل؟', 'Что-нибудь облегчает это?'),
+    P('P', 'yn', 'Does anything make it worse?', '¿Hay algo que lo empeore?', '有什么会让它更严重吗？', 'Có điều gì làm nó tệ hơn không?', 'May nakapagpapalala po ba nito?', 'هل هناك شيء يجعله أسوأ؟', 'Что-нибудь усиливает это?'),
+    P('P', 'yn', 'Does it hurt more when you breathe or move?', '¿Le duele más al respirar o al moverse?', '呼吸或活动时会更疼吗？', 'Bạn có đau hơn khi thở hoặc cử động không?', 'Mas sumasakit po ba kapag humihinga o gumagalaw kayo?', 'هل يزداد الألم عند التنفس أو الحركة؟', 'Болит сильнее, когда вы дышите или двигаетесь?'),
+    P('P', 'yn', 'Does it hurt when I press here?', '¿Le duele cuando presiono aquí?', '我按这里会疼吗？', 'Tôi ấn vào đây bạn có đau không?', 'Masakit po ba kapag pinindot ko rito?', 'هل يؤلمك عندما أضغط هنا؟', 'Больно, когда я нажимаю здесь?'),
+    P('Q', 'yn', 'Is the pain sharp or stabbing?', '¿El dolor es agudo o punzante?', '是刺痛或者锐痛吗？', 'Cơn đau có nhói như dao đâm không?', 'Matalas po ba o parang tinutusok ang sakit?', 'هل الألم حاد أو كالطعن؟', 'Боль острая или колющая?'),
+    P('Q', 'yn', 'Does it feel like pressure or squeezing?', '¿Se siente como presión u opresión?', '感觉像压迫或者被挤压吗？', 'Có cảm giác bị đè nặng hoặc bóp chặt không?', 'Parang may nakadagan o pumipiga po ba?', 'هل تشعر بضغط أو انقباض؟', 'Это похоже на давление или сжатие?'),
+    P('Q', 'yn', 'Is it a burning pain?', '¿Siente ardor, como quemazón?', '是烧灼样的疼吗？', 'Có phải đau rát như bỏng không?', 'Mahapdi po ba o parang nag-aapoy ang sakit?', 'هل هو ألم حارق؟', 'Боль жгучая?'),
+    P('Q', 'yn', 'Is it a dull ache?', '¿Es un dolor sordo?', '是隐隐的钝痛吗？', 'Có phải đau âm ỉ không?', 'Banayad pero tuloy-tuloy po ba ang kirot?', 'هل هو ألم خفيف مستمر؟', 'Боль тупая, ноющая?'),
+    P('Q', 'yn', 'Does it feel like tearing or ripping?', '¿Se siente como si algo se desgarrara?', '有撕裂样的感觉吗？', 'Có cảm giác như bị xé rách không?', 'Parang napupunit po ba?', 'هل تشعر وكأن شيئاً يتمزق؟', 'Ощущение, будто что-то разрывается?'),
+    P('R', 'point', 'Does the pain move anywhere else? Point to where.', '¿El dolor se mueve hacia otra parte? Señale dónde.', '疼痛会扩散到其他地方吗？请指出来。', 'Cơn đau có lan sang chỗ khác không? Hãy chỉ cho tôi.', 'Kumakalat po ba ang sakit sa ibang bahagi? Ituro po kung saan.', 'هل ينتقل الألم إلى مكان آخر؟ أشر إلى المكان.', 'Боль отдаёт куда-нибудь? Покажите куда.'),
+    P('S', 'scale', 'From 0 to 10, how bad is the pain? 0 is no pain, 10 is the worst pain.', 'Del 0 al 10, ¿qué tan fuerte es el dolor? 0 es sin dolor y 10 es el peor dolor.', '从0到10，疼痛有多严重？0是不疼，10是最疼。', 'Từ 0 đến 10, bạn đau mức nào? 0 là không đau, 10 là đau nhất.', 'Mula 0 hanggang 10, gaano po kasakit? Ang 0 ay walang sakit, ang 10 ay pinakamatinding sakit.', 'من 0 إلى 10، ما شدة الألم؟ 0 يعني لا ألم، و10 يعني أشد ألم.', 'По шкале от 0 до 10, насколько сильная боль? 0 — нет боли, 10 — самая сильная боль.'),
+    P('T', 'yn', 'Is the pain constant?', '¿El dolor es constante?', '疼痛是持续的吗？', 'Cơn đau có liên tục không?', 'Tuloy-tuloy po ba ang sakit?', 'هل الألم مستمر؟', 'Боль постоянная?'),
+    P('T', 'yn', 'Does the pain come and go?', '¿El dolor va y viene?', '疼痛时有时无吗？', 'Cơn đau có lúc đến lúc đi không?', 'Pabalik-balik po ba ang sakit?', 'هل يأتي الألم ويذهب؟', 'Боль то появляется, то проходит?'),
+    P('T', 'yn', 'Have you had this pain before?', '¿Ha tenido este dolor antes?', '您以前有过这种疼痛吗？', 'Bạn đã từng bị đau như thế này trước đây chưa?', 'Naranasan na po ba ninyo ang sakit na ito dati?', 'هل شعرت بهذا الألم من قبل؟', 'У вас раньше была такая боль?'),
+  ]},
+
+  { id: 'sample', name: 'SAMPLE – History', phrases: [
+    P('S', 'open', 'What is bothering you the most right now?', '¿Qué es lo que más le molesta ahora?', '您现在最不舒服的是什么？', 'Điều gì làm bạn khó chịu nhất lúc này?', 'Ano po ang pinakanararamdaman ninyo ngayon?', 'ما الذي يزعجك أكثر الآن؟', 'Что вас сейчас беспокоит больше всего?'),
+    P('A', 'yn', 'Are you allergic to any medicines?', '¿Es alérgico a algún medicamento?', '您对任何药物过敏吗？', 'Bạn có bị dị ứng với thuốc nào không?', 'May allergy po ba kayo sa anumang gamot?', 'هل لديك حساسية من أي دواء؟', 'У вас есть аллергия на лекарства?'),
+    P('A', 'yn', 'Are you allergic to anything else, like food, latex, or bee stings?', '¿Es alérgico a algo más, como comida, látex o picaduras de abeja?', '您对其他东西过敏吗？比如食物、乳胶或蜜蜂蜇伤？', 'Bạn có dị ứng với thứ gì khác không, như thức ăn, cao su latex, hoặc ong đốt?', 'May allergy po ba kayo sa iba pa, tulad ng pagkain, latex, o kagat ng bubuyog?', 'هل لديك حساسية من أي شيء آخر، مثل الطعام أو اللاتكس أو لسعات النحل؟', 'У вас есть аллергия на что-то ещё, например на еду, латекс или укусы пчёл?'),
+    P('M', 'yn', 'Do you take any medicines?', '¿Toma algún medicamento?', '您在服用什么药吗？', 'Bạn có đang dùng thuốc nào không?', 'May iniinom po ba kayong gamot?', 'هل تتناول أي أدوية؟', 'Вы принимаете какие-нибудь лекарства?'),
+    P('M', 'instr', 'Please show me your medicines.', 'Por favor, enséñeme sus medicamentos.', '请把您的药拿给我看。', 'Vui lòng cho tôi xem thuốc của bạn.', 'Pakipakita po ang mga gamot ninyo.', 'من فضلك أرني أدويتك.', 'Пожалуйста, покажите мне ваши лекарства.'),
+    { ...BLOOD_THINNERS, tag: 'M' },
+    P('M', 'yn', 'Did you take your medicines today?', '¿Tomó sus medicamentos hoy?', '您今天吃药了吗？', 'Hôm nay bạn đã uống thuốc chưa?', 'Nainom po ba ninyo ang mga gamot ninyo ngayong araw?', 'هل تناولت أدويتك اليوم؟', 'Вы сегодня принимали свои лекарства?'),
+    P('P', 'yn', 'Do you have any medical problems?', '¿Tiene algún problema de salud?', '您有什么疾病吗？', 'Bạn có bệnh gì không?', 'May sakit po ba kayo o kondisyong medikal?', 'هل لديك أي مشاكل صحية؟', 'У вас есть какие-нибудь заболевания?'),
+    P('P', 'yn', 'Do you have heart problems?', '¿Tiene problemas del corazón?', '您有心脏病吗？', 'Bạn có bệnh tim không?', 'May sakit po ba kayo sa puso?', 'هل لديك مشاكل في القلب؟', 'У вас есть проблемы с сердцем?'),
+    P('P', 'yn', 'Do you have diabetes?', '¿Tiene diabetes?', '您有糖尿病吗？', 'Bạn có bị tiểu đường không?', 'May diabetes po ba kayo?', 'هل لديك مرض السكري؟', 'У вас диабет?'),
+    P('P', 'yn', 'Do you have high blood pressure?', '¿Tiene la presión alta?', '您有高血压吗？', 'Bạn có bị cao huyết áp không?', 'Mataas po ba ang presyon ng dugo ninyo?', 'هل لديك ارتفاع في ضغط الدم؟', 'У вас повышенное давление?'),
+    P('P', 'yn', 'Do you have asthma or lung problems?', '¿Tiene asma o problemas de los pulmones?', '您有哮喘或肺病吗？', 'Bạn có bị hen suyễn hoặc bệnh phổi không?', 'May hika po ba kayo o sakit sa baga?', 'هل لديك ربو أو مشاكل في الرئة؟', 'У вас астма или заболевания лёгких?'),
+    P('P', 'yn', 'Have you had surgery recently?', '¿Le han operado recientemente?', '您最近做过手术吗？', 'Gần đây bạn có phẫu thuật không?', 'Naoperahan po ba kayo kamakailan?', 'هل أجريت عملية جراحية مؤخراً؟', 'Вам недавно делали операцию?'),
+    P('L', 'open', 'When did you last eat or drink?', '¿Cuándo comió o bebió por última vez?', '您最后一次吃东西或喝水是什么时候？', 'Lần cuối bạn ăn hoặc uống là khi nào?', 'Kailan po kayo huling kumain o uminom?', 'متى أكلت أو شربت آخر مرة؟', 'Когда вы в последний раз ели или пили?'),
+    P('E', 'open', 'What happened?', '¿Qué pasó?', '发生了什么事？', 'Chuyện gì đã xảy ra?', 'Ano po ang nangyari?', 'ماذا حدث؟', 'Что случилось?'),
+    P('E', 'open', 'What happened right before this started?', '¿Qué pasó justo antes de que empezara esto?', '这开始之前发生了什么？', 'Chuyện gì đã xảy ra ngay trước khi việc này bắt đầu?', 'Ano po ang nangyari bago ito nagsimula?', 'ماذا حدث قبل أن يبدأ هذا مباشرة؟', 'Что произошло прямо перед тем, как это началось?'),
+  ]},
+
+  { id: 'stroke', name: 'Stroke', phrases: [
+    P('', 'instr', 'Please smile and show me your teeth.', 'Por favor, sonría y enséñeme los dientes.', '请笑一下，露出牙齿。', 'Vui lòng cười và cho tôi xem răng.', 'Pakingiti po at ipakita ang inyong ngipin.', 'من فضلك ابتسم وأرني أسنانك.', 'Пожалуйста, улыбнитесь и покажите зубы.'),
+    P('', 'instr', 'Close your eyes and hold both arms out for 10 seconds.', 'Cierre los ojos y extienda los dos brazos por 10 segundos.', '请闭上眼睛，双臂向前伸直，保持10秒。', 'Hãy nhắm mắt và giơ thẳng hai tay ra trước trong 10 giây.', 'Pumikit po kayo at iunat ang dalawang braso nang 10 segundo.', 'أغمض عينيك ومدّ ذراعيك للأمام لمدة 10 ثوانٍ.', 'Закройте глаза и вытяните обе руки вперёд на 10 секунд.'),
+    P('', 'open', "Repeat after me: 'The sky is blue.'", 'Repita después de mí: «El cielo es azul».', '请跟我说：“天空是蓝色的。”', 'Hãy nói theo tôi: “Bầu trời màu xanh.”', "Ulitin po ninyo: 'Asul ang langit.'", 'كرّر بعدي: «السماء زرقاء».', 'Повторите за мной: «Небо голубое».'),
+    P('', 'instr', 'Squeeze my hands.', 'Apriete mis manos.', '请握紧我的手。', 'Hãy bóp chặt tay tôi.', 'Pisilin po ang mga kamay ko.', 'اضغط على يديّ.', 'Сожмите мои руки.'),
+    P('', 'open', 'What time did you last feel normal?', '¿A qué hora se sintió normal por última vez?', '您最后一次感觉正常是几点？', 'Lần cuối bạn cảm thấy bình thường là lúc mấy giờ?', 'Anong oras po kayo huling naging normal ang pakiramdam?', 'في أي ساعة شعرت بأنك طبيعي آخر مرة؟', 'В котором часу вы последний раз чувствовали себя нормально?'),
+    P('', 'yn', 'Do you feel weak or numb on one side of your body?', '¿Siente debilidad o adormecimiento en un lado del cuerpo?', '您身体一侧感到无力或麻木吗？', 'Bạn có thấy yếu hoặc tê một bên người không?', 'Nanghihina o namamanhid po ba ang isang bahagi ng katawan ninyo?', 'هل تشعر بضعف أو خدر في جانب واحد من جسمك؟', 'Вы чувствуете слабость или онемение с одной стороны тела?'),
+    P('', 'yn', 'Is it hard to speak or find words?', '¿Le cuesta hablar o encontrar las palabras?', '您说话或找词有困难吗？', 'Bạn có khó nói hoặc khó tìm từ không?', 'Nahihirapan po ba kayong magsalita o makahanap ng salita?', 'هل تجد صعوبة في الكلام أو إيجاد الكلمات؟', 'Вам трудно говорить или подбирать слова?'),
+    P('', 'yn', 'Is your vision blurry or are you seeing double?', '¿Ve borroso o doble?', '您看东西模糊或者有重影吗？', 'Bạn có nhìn mờ hoặc nhìn thấy hai hình không?', 'Malabo po ba ang paningin ninyo o doble ang nakikita?', 'هل رؤيتك ضبابية أو ترى الأشياء مزدوجة؟', 'У вас нечёткое зрение или двоится в глазах?'),
+    P('', 'yn', 'Is this the worst headache of your life?', '¿Es el peor dolor de cabeza de su vida?', '这是您这辈子最严重的头痛吗？', 'Đây có phải là cơn đau đầu tồi tệ nhất trong đời bạn không?', 'Ito na po ba ang pinakamatinding sakit ng ulo sa buhay ninyo?', 'هل هذا أسوأ صداع في حياتك؟', 'Это самая сильная головная боль в вашей жизни?'),
+    BLOOD_THINNERS,
+    P('', 'open', 'What day is it today?', '¿Qué día es hoy?', '今天是星期几？', 'Hôm nay là thứ mấy?', 'Anong araw po ngayon?', 'ما هو اليوم؟', 'Какой сегодня день?'),
+  ]},
+
+  { id: 'cardiac', name: 'Cardiac / Chest pain', phrases: [
+    P('', 'yn', 'Do you have chest pain or pressure?', '¿Tiene dolor o presión en el pecho?', '您胸口疼或者有压迫感吗？', 'Bạn có đau hoặc tức ngực không?', 'May sakit o paninikip po ba sa dibdib ninyo?', 'هل لديك ألم أو ضغط في الصدر؟', 'У вас боль или давление в груди?'),
+    P('', 'yn', 'Does the pain go to your arm, jaw, neck, or back?', '¿El dolor se va al brazo, la mandíbula, el cuello o la espalda?', '疼痛会传到手臂、下巴、脖子或背部吗？', 'Cơn đau có lan ra tay, hàm, cổ hoặc lưng không?', 'Umaabot po ba ang sakit sa braso, panga, leeg, o likod?', 'هل ينتقل الألم إلى ذراعك أو فكك أو رقبتك أو ظهرك؟', 'Боль отдаёт в руку, челюсть, шею или спину?'),
+    P('', 'yn', 'Are you short of breath?', '¿Le falta el aire?', '您呼吸急促吗？', 'Bạn có bị khó thở không?', 'Hinihingal po ba kayo?', 'هل تشعر بضيق في التنفس؟', 'Вам не хватает воздуха?'),
+    P('', 'yn', 'Do you feel sick to your stomach?', '¿Tiene náuseas?', '您恶心吗？', 'Bạn có buồn nôn không?', 'Nasusuka po ba kayo?', 'هل تشعر بالغثيان؟', 'Вас тошнит?'),
+    P('', 'yn', 'Are you sweating more than usual?', '¿Está sudando más de lo normal?', '您比平时出汗多吗？', 'Bạn có đổ mồ hôi nhiều hơn bình thường không?', 'Mas pinagpapawisan po ba kayo kaysa karaniwan?', 'هل تتعرّق أكثر من المعتاد؟', 'Вы потеете сильнее обычного?'),
+    P('', 'yn', 'Did you feel dizzy or pass out?', '¿Se mareó o se desmayó?', '您头晕或者昏倒过吗？', 'Bạn có bị chóng mặt hoặc ngất xỉu không?', 'Nahilo po ba kayo o nawalan ng malay?', 'هل شعرت بدوار أو أغمي عليك؟', 'У вас кружилась голова или был обморок?'),
+    P('', 'yn', 'Do you have a pacemaker or defibrillator?', '¿Tiene marcapasos o desfibrilador?', '您装了心脏起搏器或除颤器吗？', 'Bạn có máy tạo nhịp tim hoặc máy khử rung tim không?', 'May pacemaker o defibrillator po ba kayo?', 'هل لديك جهاز تنظيم ضربات القلب أو مزيل رجفان؟', 'У вас есть кардиостимулятор или дефибриллятор?'),
+    P('', 'yn', 'Have you taken nitroglycerin today?', '¿Ha tomado nitroglicerina hoy?', '您今天用过硝酸甘油吗？', 'Hôm nay bạn có dùng nitroglycerin không?', 'Uminom po ba kayo ng nitroglycerin ngayong araw?', 'هل تناولت النيتروغليسرين اليوم؟', 'Вы сегодня принимали нитроглицерин?'),
+    P('', 'yn', 'In the last 2 days, have you taken medicine for erections, like Viagra or Cialis?', 'En los últimos 2 días, ¿ha tomado medicina para la erección, como Viagra o Cialis?', '最近两天内，您服用过治疗勃起的药物吗？比如伟哥或希爱力？', 'Trong 2 ngày qua, bạn có dùng thuốc cương dương như Viagra hoặc Cialis không?', 'Sa nakaraang 2 araw, uminom po ba kayo ng gamot para sa erection, tulad ng Viagra o Cialis?', 'خلال اليومين الماضيين، هل تناولت دواءً لضعف الانتصاب مثل الفياغرا أو السياليس؟', 'За последние 2 дня вы принимали препараты для эрекции, например Виагру или Сиалис?'),
+    P('', 'yn', 'Are you allergic to aspirin?', '¿Es alérgico a la aspirina?', '您对阿司匹林过敏吗？', 'Bạn có dị ứng với aspirin không?', 'May allergy po ba kayo sa aspirin?', 'هل لديك حساسية من الأسبرين؟', 'У вас есть аллергия на аспирин?'),
+    P('', 'instr', 'Chew this aspirin, then swallow it.', 'Mastique esta aspirina y luego tráguesela.', '请嚼碎这片阿司匹林，然后吞下去。', 'Hãy nhai viên aspirin này rồi nuốt.', 'Nguyain po ninyo ang aspirin na ito, tapos lunukin.', 'امضغ قرص الأسبرين هذا ثم ابتلعه.', 'Разжуйте эту таблетку аспирина и проглотите.'),
+    P('', 'instr', 'Put this under your tongue. Do not swallow it.', 'Póngase esto debajo de la lengua. No se lo trague.', '请把这个放在舌头下面，不要吞下去。', 'Hãy đặt cái này dưới lưỡi. Đừng nuốt.', 'Ilagay po ito sa ilalim ng dila. Huwag lunukin.', 'ضع هذا تحت لسانك. لا تبتلعه.', 'Положите это под язык. Не глотайте.'),
+  ]},
+
+  { id: 'breathing', name: 'Breathing / Respiratory', phrases: [
+    P('', 'yn', 'Are you having trouble breathing?', '¿Tiene dificultad para respirar?', '您呼吸困难吗？', 'Bạn có khó thở không?', 'Nahihirapan po ba kayong huminga?', 'هل تجد صعوبة في التنفس؟', 'Вам трудно дышать?'),
+    P('', 'yn', 'Do you use an inhaler? Where is it?', '¿Usa un inhalador? ¿Dónde está?', '您用吸入器吗？在哪里？', 'Bạn có dùng ống hít không? Nó ở đâu?', 'Gumagamit po ba kayo ng inhaler? Nasaan po ito?', 'هل تستخدم بخاخاً؟ أين هو؟', 'Вы пользуетесь ингалятором? Где он?'),
+    P('', 'yn', 'Do you use oxygen at home?', '¿Usa oxígeno en casa?', '您在家用氧气吗？', 'Bạn có dùng ôxy ở nhà không?', 'Gumagamit po ba kayo ng oxygen sa bahay?', 'هل تستخدم الأكسجين في المنزل؟', 'Вы дома пользуетесь кислородом?'),
+    P('', 'yn', 'Do you have a cough?', '¿Tiene tos?', '您咳嗽吗？', 'Bạn có ho không?', 'May ubo po ba kayo?', 'هل لديك سعال؟', 'У вас есть кашель?'),
+    P('', 'yn', 'Is your throat or tongue swelling?', '¿Se le está hinchando la garganta o la lengua?', '您的喉咙或舌头肿了吗？', 'Cổ họng hoặc lưỡi của bạn có bị sưng không?', 'Namamaga po ba ang lalamunan o dila ninyo?', 'هل حلقك أو لسانك متورّم؟', 'У вас отекает горло или язык?'),
+    P('', 'instr', 'This mask will give you oxygen. Breathe normally.', 'Esta mascarilla le dará oxígeno. Respire normalmente.', '这个面罩会给您输氧。请正常呼吸。', 'Mặt nạ này sẽ cung cấp ôxy cho bạn. Hãy thở bình thường.', 'Ang mask na ito ay magbibigay ng oxygen. Huminga po nang normal.', 'هذا القناع سيعطيك الأكسجين. تنفّس بشكل طبيعي.', 'Эта маска даст вам кислород. Дышите спокойно.'),
+    P('', 'instr', 'Breathe slowly with me.', 'Respire despacio conmigo.', '请跟着我慢慢呼吸。', 'Hãy thở chậm cùng tôi.', 'Huminga po nang dahan-dahan kasabay ko.', 'تنفّس ببطء معي.', 'Дышите медленно вместе со мной.'),
+    P('', 'instr', 'Take a deep breath in.', 'Respire profundo.', '请深吸一口气。', 'Hãy hít một hơi thật sâu.', 'Huminga po nang malalim.', 'خذ نفساً عميقاً.', 'Сделайте глубокий вдох.'),
+  ]},
+
+  { id: 'trauma', name: 'Trauma', phrases: [
+    P('', 'yn', 'Did you fall?', '¿Se cayó?', '您摔倒了吗？', 'Bạn có bị ngã không?', 'Nahulog o natumba po ba kayo?', 'هل سقطت؟', 'Вы упали?'),
+    P('', 'yn', 'Did you hit your head?', '¿Se golpeó la cabeza?', '您撞到头了吗？', 'Bạn có bị đập đầu không?', 'Tumama po ba ang ulo ninyo?', 'هل ارتطم رأسك؟', 'Вы ударились головой?'),
+    P('', 'yn', 'Did you pass out?', '¿Perdió el conocimiento?', '您失去过意识吗？', 'Bạn có bị bất tỉnh không?', 'Nawalan po ba kayo ng malay?', 'هل فقدت الوعي؟', 'Вы теряли сознание?'),
+    P('', 'yn', 'Does your neck or back hurt?', '¿Le duele el cuello o la espalda?', '您脖子或背部疼吗？', 'Cổ hoặc lưng bạn có đau không?', 'Masakit po ba ang leeg o likod ninyo?', 'هل تؤلمك رقبتك أو ظهرك؟', 'У вас болит шея или спина?'),
+    P('', 'instr', 'Do not move your head.', 'No mueva la cabeza.', '请不要动头。', 'Đừng cử động đầu.', 'Huwag po ninyong igalaw ang ulo ninyo.', 'لا تحرّك رأسك.', 'Не двигайте головой.'),
+    P('', 'instr', 'Wiggle your fingers and toes.', 'Mueva los dedos de las manos y de los pies.', '请动一动您的手指和脚趾。', 'Hãy cử động các ngón tay và ngón chân.', 'Igalaw po ang mga daliri sa kamay at paa.', 'حرّك أصابع يديك وقدميك.', 'Пошевелите пальцами рук и ног.'),
+    P('', 'yn', 'Can you feel me touching you?', '¿Siente que le estoy tocando?', '您能感觉到我在碰您吗？', 'Bạn có cảm thấy tôi đang chạm vào bạn không?', 'Nararamdaman po ba ninyo na hinahawakan ko kayo?', 'هل تشعر بلمسي لك؟', 'Вы чувствуете, как я к вам прикасаюсь?'),
+    P('', 'yn', 'Were you wearing a seatbelt?', '¿Llevaba puesto el cinturón de seguridad?', '您系安全带了吗？', 'Bạn có thắt dây an toàn không?', 'Naka-seatbelt po ba kayo?', 'هل كنت ترتدي حزام الأمان؟', 'Вы были пристёгнуты ремнём безопасности?'),
+    P('', 'point', 'Where are you bleeding? Point to it.', '¿Dónde está sangrando? Señálelo.', '哪里在流血？请指给我看。', 'Bạn bị chảy máu ở đâu? Hãy chỉ cho tôi.', 'Saan po kayo dumudugo? Ituro po ninyo.', 'أين تنزف؟ أشر إلى المكان.', 'Где у вас кровотечение? Покажите.'),
+    P('', 'instr', 'We need to cut your clothes to check for injuries.', 'Necesitamos cortarle la ropa para revisar si tiene heridas.', '我们需要剪开您的衣服检查伤势。', 'Chúng tôi cần cắt quần áo của bạn để kiểm tra vết thương.', 'Kailangan po naming gupitin ang damit ninyo para tingnan ang mga sugat.', 'نحتاج إلى قصّ ملابسك لفحص الإصابات.', 'Нам нужно разрезать вашу одежду, чтобы осмотреть травмы.'),
+    P('', 'yn', 'Can you walk?', '¿Puede caminar?', '您能走路吗？', 'Bạn có đi được không?', 'Nakakalakad po ba kayo?', 'هل تستطيع المشي؟', 'Вы можете идти?'),
+  ]},
+
+  { id: 'illness', name: 'Illness / Medical', phrases: [
+    P('', 'yn', 'Do you have a fever?', '¿Tiene fiebre?', '您发烧吗？', 'Bạn có bị sốt không?', 'May lagnat po ba kayo?', 'هل لديك حمّى؟', 'У вас температура?'),
+    P('', 'yn', 'Do you feel dizzy or weak?', '¿Se siente mareado o débil?', '您感到头晕或无力吗？', 'Bạn có thấy chóng mặt hoặc yếu không?', 'Nahihilo o nanghihina po ba kayo?', 'هل تشعر بدوار أو ضعف؟', 'У вас кружится голова или слабость?'),
+    P('', 'yn', 'Are you vomiting?', '¿Está vomitando?', '您呕吐吗？', 'Bạn có bị nôn không?', 'Nagsusuka po ba kayo?', 'هل تتقيأ؟', 'У вас рвота?'),
+    P('', 'yn', 'Is there blood in your vomit or stool?', '¿Hay sangre en el vómito o en las heces?', '您的呕吐物或大便里有血吗？', 'Có máu trong chất nôn hoặc phân của bạn không?', 'May dugo po ba sa suka o dumi ninyo?', 'هل يوجد دم في القيء أو البراز؟', 'Есть кровь в рвоте или стуле?'),
+    P('', 'yn', 'Do you have diarrhea?', '¿Tiene diarrea?', '您腹泻吗？', 'Bạn có bị tiêu chảy không?', 'Nagtatae po ba kayo?', 'هل لديك إسهال؟', 'У вас понос?'),
+    P('', 'open', 'How many days have you been sick?', '¿Cuántos días lleva enfermo?', '您病了几天了？', 'Bạn bị bệnh mấy ngày rồi?', 'Ilang araw na po kayong may sakit?', 'منذ كم يوم وأنت مريض؟', 'Сколько дней вы болеете?'),
+    P('', 'yn', 'Do you use insulin?', '¿Usa insulina?', '您用胰岛素吗？', 'Bạn có dùng insulin không?', 'Gumagamit po ba kayo ng insulin?', 'هل تستخدم الإنسولين؟', 'Вы колете инсулин?'),
+    P('', 'instr', 'We need to check your blood sugar with a small finger prick.', 'Necesitamos medirle el azúcar con un pequeño pinchazo en el dedo.', '我们需要扎一下您的手指来测血糖。', 'Chúng tôi cần chích nhẹ đầu ngón tay để đo đường huyết.', 'Kailangan po naming tusukin nang kaunti ang daliri ninyo para sukatin ang asukal sa dugo.', 'نحتاج إلى وخز إصبعك وخزة صغيرة لقياس السكر في الدم.', 'Нам нужно уколоть палец, чтобы измерить сахар в крови.'),
+    P('', 'yn', 'Did you just have a seizure?', '¿Acaba de tener una convulsión?', '您刚才发生抽搐了吗？', 'Bạn có vừa bị co giật không?', 'Nagkaroon po ba kayo ng seizure (kombulsyon) kanina?', 'هل أصبت بنوبة تشنج للتو؟', 'У вас только что был судорожный приступ?'),
+    P('', 'yn', 'Do you have epilepsy?', '¿Tiene epilepsia?', '您有癫痫吗？', 'Bạn có bị động kinh không?', 'May epilepsy po ba kayo?', 'هل لديك صرع؟', 'У вас эпилепсия?'),
+    P('', 'yn', 'Have you had any alcohol or drugs today?', '¿Ha tomado alcohol o drogas hoy?', '您今天喝过酒或用过毒品吗？', 'Hôm nay bạn có uống rượu hoặc dùng ma túy không?', 'Uminom po ba kayo ng alak o gumamit ng droga ngayong araw?', 'هل تناولت أي كحول أو مخدرات اليوم؟', 'Вы сегодня употребляли алкоголь или наркотики?'),
+    P('', 'yn', 'Did you take too much of any medicine?', '¿Tomó demasiada cantidad de algún medicamento?', '您是否服用了过量的药物？', 'Bạn có uống quá liều thuốc nào không?', 'Sobra po ba ang nainom ninyong gamot?', 'هل تناولت جرعة زائدة من أي دواء؟', 'Вы приняли слишком много какого-либо лекарства?'),
+    P('', 'yn', 'Are you thinking about hurting yourself?', '¿Está pensando en hacerse daño?', '您有伤害自己的想法吗？', 'Bạn có đang nghĩ đến việc làm hại bản thân không?', 'Iniisip po ba ninyong saktan ang sarili ninyo?', 'هل تفكّر في إيذاء نفسك؟', 'Вы думаете о том, чтобы причинить себе вред?'),
+  ]},
+
+  { id: 'ob', name: 'OB / Pregnancy', phrases: [
+    P('', 'yn', 'Are you pregnant?', '¿Está embarazada?', '您怀孕了吗？', 'Bạn có đang mang thai không?', 'Buntis po ba kayo?', 'هل أنتِ حامل؟', 'Вы беременны?'),
+    P('', 'open', 'How many months pregnant are you?', '¿De cuántos meses está embarazada?', '您怀孕几个月了？', 'Bạn mang thai được mấy tháng rồi?', 'Ilang buwan na po kayong buntis?', 'في أي شهر من الحمل أنتِ؟', 'Какой у вас срок беременности (в месяцах)?'),
+    P('', 'yn', 'Is this your first baby?', '¿Es su primer bebé?', '这是您的第一个孩子吗？', 'Đây có phải là con đầu lòng của bạn không?', 'Ito po ba ang una ninyong anak?', 'هل هذا طفلك الأول؟', 'Это ваш первый ребёнок?'),
+    P('', 'yn', 'Are you having contractions?', '¿Tiene contracciones?', '您有宫缩吗？', 'Bạn có đang bị cơn gò tử cung không?', 'Naghihilab po ba ang tiyan ninyo (contractions)?', 'هل لديكِ تقلصات (طَلْق)؟', 'У вас схватки?'),
+    P('', 'open', 'How many minutes apart are the contractions?', '¿Cada cuántos minutos le vienen las contracciones?', '宫缩间隔几分钟？', 'Các cơn gò cách nhau bao nhiêu phút?', 'Ilang minuto po ang pagitan ng bawat hilab?', 'كم دقيقة بين كل تقلص والآخر؟', 'Через сколько минут повторяются схватки?'),
+    P('', 'yn', 'Has your water broken?', '¿Se le rompió la fuente?', '您破水了吗？', 'Bạn đã vỡ ối chưa?', 'Pumutok na po ba ang panubigan ninyo?', 'هل نزل ماء الرأس؟', 'У вас отошли воды?'),
+    P('', 'yn', 'Are you bleeding?', '¿Está sangrando?', '您在出血吗？', 'Bạn có bị chảy máu không?', 'Dinudugo po ba kayo?', 'هل تنزفين؟', 'У вас кровотечение?'),
+    P('', 'yn', 'Do you feel the urge to push?', '¿Siente ganas de pujar?', '您有想用力的感觉吗？', 'Bạn có cảm giác muốn rặn không?', 'Nararamdaman po ba ninyong gusto nang umire?', 'هل تشعرين برغبة في الدفع؟', 'Вы чувствуете потребность тужиться?'),
+    P('', 'yn', 'Can you feel the baby moving?', '¿Siente que el bebé se mueve?', '您能感觉到宝宝在动吗？', 'Bạn có cảm thấy em bé cử động không?', 'Nararamdaman po ba ninyong gumagalaw ang sanggol?', 'هل تشعرين بحركة الجنين؟', 'Вы чувствуете, как шевелится ребёнок?'),
+    P('', 'yn', 'Have you had any problems with this pregnancy?', '¿Ha tenido algún problema con este embarazo?', '这次怀孕有过什么问题吗？', 'Lần mang thai này bạn có gặp vấn đề gì không?', 'Nagkaroon po ba kayo ng problema sa pagbubuntis na ito?', 'هل واجهتِ أي مشاكل في هذا الحمل؟', 'Были ли проблемы во время этой беременности?'),
+    P('', 'open', 'When was your last period?', '¿Cuándo fue su última regla?', '您上次月经是什么时候？', 'Kỳ kinh cuối cùng của bạn là khi nào?', 'Kailan po ang huli ninyong regla?', 'متى كانت آخر دورة شهرية لكِ؟', 'Когда у вас были последние месячные?'),
+    P('', 'instr', 'Do not push. Breathe.', 'No puje. Respire.', '先不要用力。呼吸。', 'Đừng rặn. Hãy thở.', 'Huwag po munang umire. Huminga.', 'لا تدفعي. تنفّسي.', 'Не тужьтесь. Дышите.'),
+    P('', 'instr', 'Push now!', '¡Puje ahora!', '现在用力！', 'Rặn đi!', 'Umire na po!', 'ادفعي الآن!', 'Тужьтесь!'),
+  ]},
+];

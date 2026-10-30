@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scene Translator</title>
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Scene Translator">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#0b1220;--surface:#131c2e;--surface2:#1a2539;--line:#26334b;--text:#eef2f8;--muted:#95a3ba;
+  --accent:#e0323f;--accent-ink:#fff;--blue:#3b82f6;--ok:#16a34a;--bad:#dc2626;--warn:#f59e0b;
+  --radius:14px;--shadow:0 6px 24px rgba(0,0,0,.35);
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+}
+[data-theme="light"]{
+  --bg:#f3f5f9;--surface:#ffffff;--surface2:#eef1f6;--line:#d9dfe8;--text:#0f172a;--muted:#5b6578;--shadow:0 6px 20px rgba(15,23,42,.10);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans","Noto Sans Arabic","Noto Sans SC",sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+
+/* Header */
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:calc(10px + var(--sat)) 16px 10px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:34px;height:34px;flex:none}
+.brand h1{font-size:17px;margin:0;letter-spacing:.2px}
+.brand p{margin:0;font-size:12px;color:var(--muted)}
+.icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.icon-btn svg{width:20px;height:20px}
+
+main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
+.view{display:none}.view.active{display:block}
+
+/* Pickers */
+.pickers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.pickers{grid-template-columns:1fr}}
+.picker{display:block}
+.picker span{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 6px 2px}
+.picker select{width:100%;height:54px;padding:0 42px 0 14px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);
+  font-size:17px;font-weight:600;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2395a3ba' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 16px center}
+.picker select:focus{outline:2px solid var(--blue);outline-offset:1px}
+.search{margin:12px 0 8px;position:relative}
+.search input{width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);padding:0 14px 0 40px;font-size:16px}
+.search svg{position:absolute;left:13px;top:13px;width:20px;height:20px;color:var(--muted)}
+
+.note{font-size:13px;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+.note.warn{border-color:color-mix(in srgb,var(--warn) 50%,var(--line));color:var(--text)}
+
+/* Phrase list */
+.list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.group-h{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 2px 2px}
+.phrase{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);min-height:64px}
+.phrase:active{transform:scale(.99);background:var(--surface2)}
+.tag{flex:none;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:16px;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.tag.blank{background:var(--surface2);color:var(--muted)}
+.tag.blank svg{width:16px;height:16px}
+.phrase .txt{flex:1;min-width:0}
+.phrase .en{font-weight:600;font-size:16.5px}
+.phrase .tr{color:var(--muted);font-size:14.5px;margin-top:3px}
+.pill{flex:none;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.pill.yn{color:var(--blue)}.pill.scale{color:var(--warn)}.pill.open,.pill.point{color:var(--ok)}
+
+/* Bottom tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);
+  background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + var(--sab))}
+.tabs button{border:0;background:none;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--muted);border-radius:10px}
+.tabs button svg{width:24px;height:24px}
+.tabs button.active{color:var(--accent)}
+.tabs .badge{position:absolute;margin-left:22px;margin-top:-2px;background:var(--accent);color:#fff;font-size:10px;border-radius:999px;padding:1px 6px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 18px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);font-weight:700;font-size:16px}
+.btn svg{width:22px;height:22px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.block{width:100%}
+.btn:disabled{opacity:.5}
+
+/* Sheet (phrase detail) */
+.sheet{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column}
+.sheet-top{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + var(--sat)) 12px 10px;border-bottom:1px solid var(--line)}
+.sheet-top .meta{font-size:13px;color:var(--muted);font-weight:600}
+.sheet-body{flex:1;overflow:auto;padding:16px 16px 20px;max-width:760px;width:100%;margin:0 auto}
+.s-en{font-size:15px;color:var(--muted);font-weight:600;display:flex;gap:8px;align-items:flex-start}
+.s-en .lbl{flex:none;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;border:1px solid var(--line);border-radius:6px;padding:2px 6px;margin-top:1px}
+.s-tr{font-size:clamp(28px,7.4vw,44px);line-height:1.22;font-weight:750;margin:14px 0 18px;word-wrap:break-word}
+.s-actions{display:flex;gap:10px;flex-wrap:wrap}
+.s-actions .btn{flex:1}
+.answer{margin-top:22px}
+.answer h3{margin:0 0 10px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.yn button{min-height:96px;border-radius:16px;border:0;color:#fff;font-weight:800;font-size:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.yn button small{font-size:13px;font-weight:600;opacity:.85}
+.yn .y{background:var(--ok)}.yn .n{background:var(--bad)}
+.yn .u{grid-column:1 / -1;min-height:62px;font-size:20px;background:var(--surface2);color:var(--text);border:1px solid var(--line)}
+.scale{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.scale button{min-height:64px;border-radius:12px;border:0;font-weight:800;font-size:24px;color:#fff}
+.scale-legend{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
+.listen-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+.listen-box .orig{font-size:18px}
+.listen-box .eng{font-size:22px;font-weight:750;margin-top:8px}
+.listen-box .src{font-size:12px;color:var(--muted);margin-top:6px}
+.result{margin-top:16px;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--ok) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--ok) 40%,var(--line))}
+.result .k{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}
+.result .v{font-size:24px;font-weight:800;margin-top:2px}
+.sheet-nav{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 14px calc(10px + var(--sab));border-top:1px solid var(--line);background:var(--surface)}
+.mic-on{animation:pulse 1.2s infinite;background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,50,63,.55)}70%{box-shadow:0 0 0 14px rgba(224,50,63,0)}100%{box-shadow:0 0 0 0 rgba(224,50,63,0)}}
+
+/* Live */
+.live-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.live-head h2,.sec-h{font-size:20px;margin:6px 0}
+.convo{display:flex;flex-direction:column;gap:10px;min-height:120px}
+.bubble{max-width:88%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface)}
+.bubble.me{align-self:flex-end;background:color-mix(in srgb,var(--blue) 14%,var(--surface))}
+.bubble .who{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.bubble .main{font-size:20px;font-weight:700;margin-top:4px}
+.bubble .sub{font-size:14.5px;color:var(--muted);margin-top:4px}
+.bubble .row{display:flex;gap:8px;margin-top:8px}
+.bubble .row button{border:1px solid var(--line);background:var(--surface2);border-radius:9px;padding:6px 10px;font-size:13px;font-weight:600}
+.live-controls{position:sticky;bottom:calc(76px + var(--sab));margin-top:14px;display:grid;gap:10px;background:var(--bg);padding-top:8px}
+.mics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mic{min-height:84px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-weight:800;font-size:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.mic svg{width:26px;height:26px}
+.mic small{font-weight:600;color:var(--muted);font-size:12px}
+.mic.patient{border-color:color-mix(in srgb,var(--ok) 50%,var(--line))}
+.mic.me{border-color:color-mix(in srgb,var(--blue) 50%,var(--line))}
+.type-row{display:flex;gap:8px}
+.type-row input{flex:1;height:50px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-size:16px}
+.empty{color:var(--muted);text-align:center;padding:24px 10px;font-size:14.5px}
+
+/* Log */
+.log-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+.log-item .t{font-size:12px;color:var(--muted)}
+.log-item .q{font-weight:600;margin-top:2px}
+.log-item .a{font-size:18px;font-weight:800;margin-top:4px}
+.log-item .o{font-size:13.5px;color:var(--muted)}
+.toolbar{display:flex;gap:8px;margin:10px 0}
+
+/* Settings */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:15px}
+.field{margin:10px 0}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.field input[type=text],.field input[type=url],.field input[type=password],.field select{width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);padding:0 12px;font-size:16px}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0}
+.switch input{width:22px;height:22px;accent-color:var(--accent)}
+.small{font-size:13px;color:var(--muted)}
+.small a{color:var(--blue)}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--muted)}
+.status-dot.ok{background:var(--ok)}.status-dot.bad{background:var(--bad)}
+
+/* Toast & modal */
+#toast{position:fixed;left:50%;bottom:calc(92px + var(--sab));transform:translateX(-50%) translateY(20px);opacity:0;z-index:80;background:#111827;color:#fff;
+  padding:12px 16px;border-radius:12px;font-size:14.5px;max-width:92vw;box-shadow:var(--shadow);transition:.2s;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px}
+.modal-box{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;max-width:440px;box-shadow:var(--shadow)}
+.modal-box h2{margin:0 0 8px;font-size:20px}
+.modal-box p{color:var(--muted);margin:8px 0}
+[dir=rtl]{text-align:right}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#e0323f"/><path d="M14 18a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H30l-9 8v-8h-1a6 6 0 0 1-6-6z" fill="#fff"/><path d="M29 19h6v6h6v6h-6v6h-6v-6h-6v-6h6z" fill="#e0323f"/></svg>
+    <div><h1>Scene Translator</h1><p id="subtitle">EMS patient phrasebook</p></div>
+  </div>
+  <button id="themeBtn" class="icon-btn" aria-label="Switch light or dark mode">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg>
+  </button>
+</header>
+
+<main>
+  <!-- PHRASES -->
+  <section id="view-phrases" class="view active">
+    <div class="pickers">
+      <label class="picker"><span>Patient language</span><select id="langSel"></select></label>
+      <label class="picker"><span>Situation</span><select id="catSel"></select></label>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="search" type="search" placeholder="Search all phrases (e.g. allergic, pain)" autocomplete="off">
+    </div>
+    <div id="mtNote" class="note warn hidden"></div>
+    <div id="list" class="list"></div>
+  </section>
+
+  <!-- LIVE -->
+  <section id="view-live" class="view">
+    <div class="live-head"><h2>Live conversation</h2><span class="small" id="liveLangLbl"></span></div>
+    <div id="convo" class="convo"><div class="empty">Tap <b>Patient speaks</b> and hold the phone toward the patient. Their words appear here in English.<br><br>Tap <b>I speak</b> to say something in English and play it back in their language.</div></div>
+    <div class="live-controls">
+      <div class="mics">
+        <button id="micPatient" class="mic patient"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Patient speaks<small id="micPatientSub">Spanish → English</small></button>
+        <button id="micMe" class="mic me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>I speak<small id="micMeSub">English → Spanish</small></button>
+      </div>
+      <form id="typeForm" class="type-row"><input id="typeIn" placeholder="Or type in English…" autocomplete="off"><button class="btn blue" type="submit">Translate</button></form>
+    </div>
+  </section>
+
+  <!-- LOG -->
+  <section id="view-log" class="view">
+    <h2 class="sec-h">Patient answers</h2>
+    <p class="small">Answers collected this session, for your patient care report. Kept on this device only and cleared when the app is closed.</p>
+    <div class="toolbar"><button id="copyLog" class="btn blue">Copy all</button><button id="clearLog" class="btn">Clear</button></div>
+    <div id="logList"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="view-settings" class="view">
+    <h2 class="sec-h">Settings</h2>
+    <div class="card">
+      <h3>Translation service</h3>
+      <p class="small">Used for the patient's spoken answers, the Live tab, and languages without a built-in phrase set. Built-in phrases work offline and never use this.</p>
+      <div class="field"><label for="provSel">Service</label>
+        <select id="provSel">
+          <option value="auto">Automatic (best available)</option>
+          <option value="libre">LibreTranslate — self-hosted, open source (recommended)</option>
+          <option value="chrome">Chrome on-device (desktop Chrome only)</option>
+          <option value="mymemory">MyMemory free API (testing only)</option>
+        </select></div>
+      <div class="field"><label for="ltUrl">LibreTranslate server URL</label><input id="ltUrl" type="url" placeholder="https://translate.yourdept.org" autocomplete="off"></div>
+      <div class="field"><label for="ltKey">LibreTranslate API key (if required)</label><input id="ltKey" type="password" autocomplete="off"></div>
+      <div class="switch"><span>Allow MyMemory fallback<br><span class="small">Sends text to a third-party service. Do not use with real patient information.</span></span><input id="mmAllow" type="checkbox"></div>
+      <button id="testBtn" class="btn block">Test translation</button>
+      <p class="small" id="testOut" style="margin-top:8px"></p>
+    </div>
+    <div class="card">
+      <h3>Speech</h3>
+      <div class="switch"><span>Speak phrase automatically when opened</span><input id="autoSpeak" type="checkbox"></div>
+      <div class="switch"><span>Read patient answers aloud in English<br><span class="small">Hands-free: hear the answer while you work</span></span><input id="readAnswers" type="checkbox"></div>
+      <div class="field"><label for="rate">Speaking speed: <b id="rateVal"></b></label><input id="rate" type="range" min="0.6" max="1.2" step="0.05" style="width:100%"></div>
+      <p class="small" id="speechSupport"></p>
+    </div>
+    <div class="card">
+      <h3>About</h3>
+      <p class="small">Scene Translator is a communication aid for first responders. It is not a certified medical interpreter. Use a professional interpreter line when one is available, and confirm critical answers (allergies, medications, pregnancy) another way when you can.</p>
+      <p class="small">Built-in phrases: Spanish, Chinese (Mandarin), Vietnamese, Tagalog, Arabic, Russian, Japanese. Other languages use machine translation and need internet.</p>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" id="tabs">
+  <button data-view="phrases" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10"/></svg>Phrases</button>
+  <button data-view="live"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-6l-5 4v-4H7a3 3 0 0 1-3-3z"/></svg>Live</button>
+  <button data-view="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Answers<span class="badge hidden" id="logBadge">0</span></button>
+  <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
+</nav>
+
+<!-- Phrase detail -->
+<div id="sheet" class="sheet hidden" role="dialog" aria-modal="true">
+  <div class="sheet-top">
+    <button id="sClose" class="btn" style="min-height:42px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>Close</button>
+    <span class="meta" id="sMeta"></span>
+  </div>
+  <div class="sheet-body">
+    <div class="s-en"><span class="lbl">EN</span><span id="sEn"></span></div>
+    <div class="s-tr" id="sTr"></div>
+    <div class="s-actions">
+      <button id="sSpeak" class="btn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>Speak</button>
+      <button id="sSlow" class="btn">Slower</button>
+    </div>
+    <div id="sAnswer" class="answer"></div>
+    <div id="sResult" class="result hidden"></div>
+  </div>
+  <div class="sheet-nav">
+    <button id="sPrev" class="btn">← Previous</button>
+    <button id="sNext" class="btn blue">Next question →</button>
+  </div>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-box">
+    <h2>Before you use this on scene</h2>
+    <p>Scene Translator helps you communicate with patients, but it is not a certified medical interpreter.</p>
+    <p>Use a professional interpreter line when one is available, and confirm critical answers another way when you can.</p>
+    <button id="modalOk" class="btn primary block" style="margin-top:10px">I understand</button>
+  </div>
+</div>
+<div id="confirm" class="modal hidden">
+  <div class="modal-box"><h2>Clear all answers?</h2><p>This removes every answer recorded this session.</p>
+    <div style="display:flex;gap:10px;margin-top:12px"><button id="confNo" class="btn" style="flex:1">Cancel</button><button id="confYes" class="btn primary" style="flex:1">Clear</button></div></div>
+</div>
+<div id="toast" role="status"></div>
+
+<script src="phrases.js"></script>
+<script>
+"use strict";
+/* ---------- Languages ---------- */
+const EN = { c:'en', name:'English', sr:'en-US', tts:['en-US','en'], mm:'en', lt:['en'] };
+const LANGS = [
+  { c:'es', name:'Spanish', native:'Español', sr:'es-US', tts:['es-US','es-MX','es'], mm:'es', lt:['es'], cur:true },
+  { c:'zh', name:'Chinese (Mandarin)', native:'中文', sr:'zh-CN', tts:['zh-CN','zh'], mm:'zh-CN', lt:['zh-Hans','zh'], cur:true },
+  { c:'vi', name:'Vietnamese', native:'Tiếng Việt', sr:'vi-VN', tts:['vi'], mm:'vi', lt:['vi'], cur:true },
+  { c:'tl', name:'Tagalog / Filipino', native:'Tagalog', sr:'fil-PH', tts:['fil','tl'], mm:'tl', lt:['tl'], cur:true },
+  { c:'ar', name:'Arabic', native:'العربية', sr:'ar-SA', tts:['ar'], mm:'ar', lt:['ar'], cur:true, rtl:true },
+  { c:'ru', name:'Russian', native:'Русский', sr:'ru-RU', tts:['ru'], mm:'ru', lt:['ru'], cur:true },
+  { c:'ja', name:'Japanese', native:'日本語', sr:'ja-JP', tts:['ja-JP','ja'], mm:'ja', lt:['ja'], cur:true },
+  { c:'pt', name:'Portuguese', native:'Português', sr:'pt-BR', tts:['pt-BR','pt'], mm:'pt-BR', lt:['pt','pt-BR'] },
+  { c:'fr', name:'French', native:'Français', sr:'fr-FR', tts:['fr'], mm:'fr', lt:['fr'] },
+  { c:'ht', name:'Haitian Creole', native:'Kreyòl ayisyen', sr:'ht-HT', tts:['ht'], mm:'ht', lt:['ht'] },
+  { c:'ko', name:'Korean', native:'한국어', sr:'ko-KR', tts:['ko'], mm:'ko', lt:['ko'] },
+  
+  { c:'hi', name:'Hindi', native:'हिन्दी', sr:'hi-IN', tts:['hi'], mm:'hi', lt:['hi'] },
+  { c:'pa', name:'Punjabi', native:'ਪੰਜਾਬੀ', sr:'pa-IN', tts:['pa'], mm:'pa', lt:['pa'] },
+  { c:'fa', name:'Farsi (Persian)', native:'فارسی', sr:'fa-IR', tts:['fa'], mm:'fa', lt:['fa'], rtl:true },
+  { c:'uk', name:'Ukrainian', native:'Українська', sr:'uk-UA', tts:['uk'], mm:'uk', lt:['uk'] },
+  { c:'so', name:'Somali', native:'Soomaali', sr:'so-SO', tts:['so'], mm:'so', lt:['so'] },
+];
+const langBy = c => c === 'en' ? EN : LANGS.find(l => l.c === c);
+
+/* ---------- State & storage ---------- */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('st_'+k); return v == null ? d : JSON.parse(v); }catch{ return d; } },
+  set(k, v){ try{ localStorage.setItem('st_'+k, JSON.stringify(v)); }catch{} }
+};
+const S = Object.assign({ lang:'es', cat:'basics', provider:'auto', ltUrl:'', ltKey:'', mmAllow:true, autoSpeak:true, readAnswers:true, rate:0.9, theme:'dark' }, store.get('settings', {}));
+const saveS = () => store.set('settings', S);
+const mtCache = store.get('mt', {});           // phrase/UI machine translations only (no patient speech)
+const saveMt = () => store.set('mt', mtCache);
+let log = [];                                  // patient answers: memory only
+let view = { list: [], idx: 0 };
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg, ms = 3200){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms); }
+const L = () => langBy(S.lang);
+const ICON_LIST = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/></svg>';
+const TYPE_LBL = { yn:'Yes / No', scale:'0–10', open:'Spoken', point:'Point', instr:'Instruction' };
+
+/* ---------- Translation services ---------- */
+const chromeTranslators = {};
+async function viaLibre(text, from, to){
+  if (!S.ltUrl) throw new Error('No LibreTranslate URL set');
+  const url = S.ltUrl.replace(/\/+$/, '') + '/translate';
+  let lastErr;
+  for (const s of from.lt) for (const t of to.lt) {
+    const body = { q:text, source:s, target:t, format:'text' };
+    if (S.ltKey) body.api_key = S.ltKey;
+    try {
+      const r = await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok && j.translatedText) return j.translatedText;
+      lastErr = new Error(j.error || ('LibreTranslate HTTP ' + r.status));
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr;
+}
+async function viaChrome(text, from, to){
+  if (!('Translator' in self)) throw new Error('Chrome on-device translation not available on this device');
+  const k = from.c + '>' + to.c;
+  if (!chromeTranslators[k]) {
+    const opts = { sourceLanguage: from.c, targetLanguage: to.c };
+    const a = await Translator.availability(opts);
+    if (a === 'unavailable') throw new Error('Chrome cannot translate this language pair');
+    chromeTranslators[k] = await Translator.create(opts);
+  }
+  return chromeTranslators[k].translate(text);
+}
+async function viaMyMemory(text, from, to){
+  const u = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + from.mm + '|' + to.mm;
+  const r = await fetch(u); const j = await r.json();
+  if (j.responseStatus != 200 || !j.responseData) throw new Error(j.responseDetails || 'MyMemory error');
+  const div = document.createElement('textarea'); div.innerHTML = j.responseData.translatedText; return div.value;
+}
+const PROVIDERS = { libre:['LibreTranslate', viaLibre], chrome:['Chrome on-device', viaChrome], mymemory:['MyMemory', viaMyMemory] };
+function providerOrder(){
+  if (S.provider !== 'auto') return [S.provider];
+  const o = [];
+  if (S.ltUrl) o.push('libre');
+  if ('Translator' in self) o.push('chrome');
+  if (S.mmAllow) o.push('mymemory');
+  return o;
+}
+async function translate(text, fromC, toC, { cache = false } = {}){
+  const from = langBy(fromC), to = langBy(toC);
+  const key = fromC + '|' + toC + '|' + text;
+  if (cache && mtCache[key]) return { text: mtCache[key], via: 'saved' };
+  const order = providerOrder();
+  if (!order.length) throw new Error('No translation service set up. Open Settings.');
+  let lastErr;
+  for (const p of order) {
+    try {
+      const out = await PROVIDERS[p][1](text, from, to);
+      if (cache) { mtCache[key] = out; saveMt(); }
+      return { text: out, via: PROVIDERS[p][0] };
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('Translation failed');
+}
+
+/* ---------- Text to speech ---------- */
+let voices = [];
+function loadVoices(){ try { voices = speechSynthesis.getVoices() || []; } catch { voices = []; } }
+if ('speechSynthesis' in window) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function pickVoice(lang){
+  const norm = v => v.lang.replace('_','-').toLowerCase();
+  for (const pref of lang.tts) {
+    const p = pref.toLowerCase();
+    const v = voices.find(v => norm(v) === p) || voices.find(v => norm(v).startsWith(p));
+    if (v) return v;
+  }
+  return null;
+}
+function speak(text, langC, rate = S.rate){
+  if (!('speechSynthesis' in window)) { toast('This browser cannot speak aloud. Show the screen to the patient.'); return; }
+  const lang = langBy(langC);
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang.tts[0]; u.rate = rate;
+  const v = pickVoice(lang);
+  if (v) u.voice = v;
+  else if (voices.length) { toast('No ' + lang.name + ' voice on this device. Show the screen to the patient.'); return; }
+  speechSynthesis.speak(u);
+}
+
+// Read a patient's answer aloud to the responder in English
+function sayEnglish(text, force){ if ((S.readAnswers || force) && text) speak(text, 'en', 1.0); }
+const PLAY_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7"/></svg>';
+
+/* ---------- Speech recognition ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+function stopListening(){ if (rec) { try { rec.stop(); } catch {} } }
+function listen(langC, { onInterim, onDone, onError }){
+  if (!SR) { onError('Speech recognition is not supported in this browser. Use Safari on iPhone or Chrome on Android.'); return; }
+  if (rec) { stopListening(); return; }
+  try { speechSynthesis.cancel(); } catch {}
+  const r = new SR();
+  r.lang = langBy(langC).sr; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+  let finalText = '', errored = false;
+  r.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const res = e.results[i];
+      if (res.isFinal) finalText += res[0].transcript + ' '; else interim += res[0].transcript;
+    }
+    onInterim && onInterim((finalText + interim).trim());
+  };
+  r.onerror = e => {
+    errored = true;
+    const m = { 'not-allowed':'Microphone blocked. Allow microphone access for this site in your browser settings.',
+      'service-not-allowed':'Microphone blocked. Allow microphone access for this site in your browser settings.',
+      'no-speech':'Didn\'t hear anything. Tap and try again.', 'network':'Speech recognition needs an internet connection.',
+      'language-not-supported':'This device can\'t recognize speech in that language. Use tap answers or typing instead.',
+      'aborted':'' }[e.error];
+    if (m !== '') onError(m || ('Speech error: ' + e.error));
+  };
+  r.onend = () => { rec = null; onDone(finalText.trim(), errored); };
+  try { r.start(); rec = r; } catch (e) { rec = null; onError(e.message); }
+}
+
+/* ---------- Phrase text helpers ---------- */
+function trOf(p, langC){
+  if (p[langC]) return p[langC];
+  return mtCache['en|' + langC + '|' + p.en] || null;
+}
+function uiOf(key, langC){
+  const t = UI_TR[key];
+  return t[langC] || mtCache['en|' + langC + '|' + t.en] || null;
+}
+let mtRun = 0;
+async function machineFill(phrases){
+  const lang = L(); if (lang.cur) return;
+  const run = ++mtRun;
+  const todo = phrases.filter(p => !trOf(p, lang.c)).map(p => p.en)
+    .concat(Object.values(UI_TR).map(u => u.en).filter(en => !mtCache['en|' + lang.c + '|' + en]));
+  let failed = 0;
+  for (const en of [...new Set(todo)]) {
+    if (run !== mtRun) return;
+    try { await translate(en, 'en', lang.c, { cache:true }); }
+    catch (e) { failed++; if (failed === 1) toast('Machine translation unavailable: ' + e.message, 5000); if (failed > 2) break; }
+    document.querySelectorAll('[data-en]').forEach(el => {
+      if (el.dataset.en === en) { const t = mtCache['en|' + lang.c + '|' + en]; if (t) el.textContent = t; }
+    });
+  }
+}
+
+/* ---------- Render: pickers ---------- */
+function renderPickers(){
+  const ls = $('#langSel');
+  const opt = l => `<option value="${l.c}">${esc(l.name)} — ${esc(l.native)}</option>`;
+  ls.innerHTML = `<optgroup label="Built-in phrases (work offline)">${LANGS.filter(l => l.cur).map(opt).join('')}</optgroup>
+    <optgroup label="Machine translated (needs internet)">${LANGS.filter(l => !l.cur).map(opt).join('')}</optgroup>`;
+  ls.value = S.lang;
+  const cs = $('#catSel');
+  cs.innerHTML = CATEGORIES.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  cs.value = S.cat;
+}
+function updateLangLabels(){
+  const l = L();
+  $('#micPatientSub').textContent = l.name.split(' ')[0] + ' → English';
+  $('#micMeSub').textContent = 'English → ' + l.name.split(' ')[0];
+  $('#liveLangLbl').textContent = 'Patient: ' + l.name;
+  $('#subtitle').textContent = 'Patient language: ' + l.name;
+}
+
+/* ---------- Render: list ---------- */
+function currentPhrases(){
+  const q = $('#search').value.trim().toLowerCase();
+  if (q) {
+    const out = [];
+    CATEGORIES.forEach(c => c.phrases.forEach(p => {
+      const hay = (p.en + ' ' + (trOf(p, S.lang) || '')).toLowerCase();
+      if (hay.includes(q) && !out.some(o => o.p.en === p.en)) out.push({ p, cat:c });
+    }));
+    return out;
+  }
+  const c = CATEGORIES.find(c => c.id === S.cat) || CATEGORIES[0];
+  return c.phrases.map(p => ({ p, cat:c }));
+}
+const LETTER_NAMES = { opqrst:{O:'Onset',P:'Provocation',Q:'Quality',R:'Radiation',S:'Severity',T:'Time'},
+  sample:{S:'Signs & symptoms',A:'Allergies',M:'Medications',P:'Past medical history',L:'Last oral intake',E:'Events leading up'} };
+function renderList(){
+  const items = currentPhrases(); view.list = items;
+  const lang = L();
+  const searching = !!$('#search').value.trim();
+  let html = '', lastTag = null;
+  if (!items.length) html = '<div class="empty">No phrases match. Try the Live tab to translate anything.</div>';
+  items.forEach(({ p, cat }, i) => {
+    const names = LETTER_NAMES[cat.id];
+    if (!searching && names && p.tag && p.tag !== lastTag) { html += `<div class="group-h">${p.tag} — ${names[p.tag]}</div>`; lastTag = p.tag; }
+    const tr = trOf(p, lang.c);
+    html += `<button class="phrase" data-i="${i}">
+      <span class="tag ${p.tag ? '' : 'blank'}">${p.tag ? esc(p.tag) : ICON_LIST}</span>
+      <span class="txt"><div class="en">${esc(p.en)}</div>
+      <div class="tr" ${lang.rtl ? 'dir="rtl"' : ''} lang="${lang.c}" data-en="${esc(p.en)}">${tr ? esc(tr) : 'Translating…'}</div></span>
+      <span class="pill ${p.type}">${TYPE_LBL[p.type]}</span></button>`;
+  });
+  $('#list').innerHTML = html;
+  const note = $('#mtNote');
+  if (lang.cur) note.classList.add('hidden');
+  else { note.classList.remove('hidden'); note.textContent = lang.name + ' uses machine translation. It needs internet and may contain errors. Keep questions simple and confirm answers.'; }
+  machineFill(items.map(x => x.p));
+}
+
+/* ---------- Phrase sheet ---------- */
+function openSheet(i){
+  view.idx = i; renderSheet();
+  $('#sheet').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  if (S.autoSpeak) speakCurrent();
+}
+function closeSheet(){ stopListening(); try{ speechSynthesis.cancel(); }catch{} $('#sheet').classList.add('hidden'); document.body.style.overflow = ''; }
+function curP(){ return view.list[view.idx]; }
+function speakCurrent(rate){ const { p } = curP(); const t = trOf(p, S.lang); if (t) speak(t, S.lang, rate); }
+function renderSheet(){
+  const { p, cat } = curP(); const lang = L();
+  const tr = trOf(p, lang.c);
+  $('#sMeta').textContent = cat.name.split(' – ')[0] + (p.tag ? ' · ' + p.tag : '') + '   ' + (view.idx + 1) + ' / ' + view.list.length;
+  $('#sEn').textContent = p.en;
+  const sTr = $('#sTr');
+  sTr.textContent = tr || 'Translating…'; sTr.lang = lang.c; sTr.dir = lang.rtl ? 'rtl' : 'ltr';
+  if (!tr) translate(p.en, 'en', lang.c, { cache:true }).then(r => { if (curP().p === p) { sTr.textContent = r.text; } }).catch(e => { sTr.textContent = '(Translation unavailable: ' + e.message + ')'; });
+  $('#sResult').classList.add('hidden');
+  $('#sPrev').disabled = view.idx === 0;
+  $('#sNext').textContent = view.idx >= view.list.length - 1 ? 'Done' : 'Next question →';
+  const a = $('#sAnswer'); const lc = lang.c; const dir = lang.rtl ? 'rtl' : 'ltr';
+  const lbl = (k) => { const t = uiOf(k, lc); return t && t !== UI_TR[k].en ? `<span dir="${dir}">${esc(t)}</span><small>${UI_TR[k].en}</small>` : `<span>${UI_TR[k].en}</span>`; };
+  if (p.type === 'yn') {
+    a.innerHTML = `<h3>Patient taps an answer</h3><div class="yn">
+      <button class="y" data-ans="yes">${lbl('yes')}</button><button class="n" data-ans="no">${lbl('no')}</button>
+      <button class="u" data-ans="unsure">${lbl('unsure')}</button></div>
+      <button class="btn block" style="margin-top:10px" data-listen>🎤 Or listen to a spoken answer</button><div class="lb"></div>`;
+  } else if (p.type === 'scale') {
+    const col = n => `hsl(${120 - n * 12},70%,${n > 5 ? 44 : 38}%)`;
+    a.innerHTML = `<h3>Patient taps a number</h3><div class="scale">${Array.from({ length:11 }, (_, n) => `<button data-ans="${n}" style="background:${col(n)}">${n}</button>`).join('')}</div>
+      <div class="scale-legend"><span>0 = ${esc(uiOf('nopain', lc) || 'No pain')}</span><span>10 = ${esc(uiOf('worst', lc) || 'Worst pain')}</span></div>`;
+  } else if (p.type === 'open' || p.type === 'point') {
+    a.innerHTML = `<h3>${p.type === 'point' ? 'Patient points — or answers out loud' : 'Patient answers out loud'}</h3>
+      <button class="btn primary block" style="min-height:64px;font-size:18px" data-listen>🎤 Listen to patient (${esc(lang.name.split(' ')[0])})</button><div class="lb"></div>
+      ${p.type === 'point' ? '<div class="field"><label>Or note where they pointed</label><input type="text" id="pointNote" placeholder="e.g. left lower abdomen" style="width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);padding:0 12px"></div><button class="btn block" id="pointSave">Save location</button>' : ''}`;
+  } else {
+    a.innerHTML = `<h3>Instruction</h3><p class="small">No answer needed. Tap <b>Speak</b> again if they didn't hear it.</p>`;
+  }
+}
+function recordAnswer(answerEn, orig, spoken){
+  const { p, cat } = curP();
+  log.unshift({ t:new Date(), cat:cat.name, q:p.en, a:answerEn, o:orig || '', lang:L().name });
+  updateBadge();
+  const r = $('#sResult');
+  r.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><div class="k">Patient answered</div><div class="v">${esc(answerEn)}</div>${orig ? `<div class="small">${esc(orig)}</div>` : ''}</div>
+    <button class="btn" id="playAns" style="min-height:44px;flex:none" aria-label="Play answer in English">${PLAY_SVG} Play</button></div>`;
+  r.classList.remove('hidden');
+  const say = (spoken ? answerEn : 'Patient says: ' + answerEn.toLowerCase()).replace(' / 10', ' out of 10');
+  const untranslated = answerEn.startsWith('(untranslated)');
+  if (untranslated) $('#playAns').remove(); else $('#playAns').onclick = () => sayEnglish(say, true);
+  if (!untranslated) sayEnglish(say);
+  if (navigator.vibrate) try { navigator.vibrate(30); } catch {}
+}
+function sheetListen(btn){
+  const box = btn.parentElement.querySelector('.lb') || btn.nextElementSibling;
+  const lang = L();
+  if (rec) { stopListening(); return; }
+  btn.classList.add('mic-on'); const old = btn.innerHTML; btn.innerHTML = '■ Stop listening';
+  box.innerHTML = `<div class="listen-box"><div class="orig" dir="${lang.rtl ? 'rtl' : 'ltr'}">${esc(uiOf('speak', lang.c) || 'Listening…')}</div><div class="src">Listening for ${esc(lang.name)}…</div></div>`;
+  listen(lang.c, {
+    onInterim: t => { box.querySelector('.orig').textContent = t; },
+    onError: m => { toast(m, 5000); },
+    onDone: async (text) => {
+      btn.classList.remove('mic-on'); btn.innerHTML = old;
+      if (!text) { box.innerHTML = ''; return; }
+      box.innerHTML = `<div class="listen-box"><div class="orig" dir="${lang.rtl ? 'rtl' : 'ltr'}">${esc(text)}</div><div class="eng">Translating…</div><div class="src"></div></div>`;
+      try {
+        const r = await translate(text, lang.c, 'en');
+        box.querySelector('.eng').textContent = r.text; box.querySelector('.src').textContent = 'Machine translated via ' + r.via;
+        recordAnswer(r.text, text, true);
+      } catch (e) {
+        box.querySelector('.eng').textContent = 'Could not translate: ' + e.message;
+        recordAnswer('(untranslated) ' + text, text);
+      }
+    }
+  });
+}
+
+/* ---------- Live tab ---------- */
+function addBubble(html, me){
+  const c = $('#convo'); const e = c.querySelector('.empty'); if (e) e.remove();
+  const d = document.createElement('div'); d.className = 'bubble' + (me ? ' me' : ''); d.innerHTML = html; c.appendChild(d);
+  d.scrollIntoView({ behavior:'smooth', block:'end' }); return d;
+}
+async function responderSays(text){
+  const lang = L();
+  const b = addBubble(`<div class="who">You (English)</div><div class="sub">${esc(text)}</div><div class="main" dir="${lang.rtl ? 'rtl' : 'ltr'}">Translating…</div>`, true);
+  try {
+    const r = await translate(text, 'en', lang.c);
+    b.querySelector('.main').textContent = r.text;
+    b.insertAdjacentHTML('beforeend', `<div class="row"><button data-say>🔊 Play again</button></div>`);
+    b.querySelector('[data-say]').onclick = () => speak(r.text, lang.c);
+    speak(r.text, lang.c);
+  } catch (e) { b.querySelector('.main').textContent = 'Could not translate: ' + e.message; }
+}
+function liveListen(btn, who){
+  const lang = L(); const src = who === 'patient' ? lang.c : 'en';
+  if (rec) { stopListening(); return; }
+  btn.classList.add('mic-on');
+  const b = addBubble(`<div class="who">${who === 'patient' ? 'Patient (' + esc(lang.name) + ')' : 'You (English)'}</div><div class="sub">Listening…</div>`, who !== 'patient');
+  listen(src, {
+    onInterim: t => { b.querySelector('.sub').textContent = t; },
+    onError: m => toast(m, 5000),
+    onDone: async (text) => {
+      btn.classList.remove('mic-on');
+      if (!text) { b.remove(); return; }
+      if (who === 'patient') {
+        b.querySelector('.sub').textContent = text; b.querySelector('.sub').dir = lang.rtl ? 'rtl' : 'ltr';
+        b.insertAdjacentHTML('beforeend', `<div class="main">Translating…</div>`);
+        try { const r = await translate(text, lang.c, 'en'); b.querySelector('.main').textContent = r.text;
+          b.insertAdjacentHTML('beforeend', `<div class="row"><button data-say>🔊 Play in English</button></div>`);
+          b.querySelector('[data-say]').onclick = () => sayEnglish(r.text, true);
+          sayEnglish(r.text);
+          log.unshift({ t:new Date(), cat:'Live', q:'(Live conversation)', a:r.text, o:text, lang:lang.name }); updateBadge(); }
+        catch (e) { b.querySelector('.main').textContent = 'Could not translate: ' + e.message; }
+      } else { b.remove(); responderSays(text); }
+    }
+  });
+}
+
+/* ---------- Log ---------- */
+function updateBadge(){ const b = $('#logBadge'); b.textContent = log.length; b.classList.toggle('hidden', !log.length); renderLog(); }
+const tfmt = d => d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+function renderLog(){
+  $('#logList').innerHTML = log.length ? log.map(e => `<div class="log-item"><div class="t">${tfmt(e.t)} · ${esc(e.cat)} · ${esc(e.lang)}</div>
+    <div class="q">${esc(e.q)}</div><div class="a">${esc(e.a)}</div>${e.o ? `<div class="o">Patient said: ${esc(e.o)}</div>` : ''}</div>`).join('')
+    : '<div class="empty">No answers yet. Answers appear here as patients respond.</div>';
+}
+function logText(){
+  return 'Patient answers via Scene Translator (machine-assisted)\n' + log.slice().reverse().map(e =>
+    `[${tfmt(e.t)}] ${e.q} — ${e.a}${e.o ? ' (patient said: "' + e.o + '")' : ''}`).join('\n');
+}
+
+/* ---------- Settings ---------- */
+function bindSettings(){
+  $('#provSel').value = S.provider; $('#ltUrl').value = S.ltUrl; $('#ltKey').value = S.ltKey;
+  $('#mmAllow').checked = S.mmAllow; $('#autoSpeak').checked = S.autoSpeak; $('#rate').value = S.rate; $('#rateVal').textContent = S.rate + '×';
+  const on = (id, ev, fn) => $(id).addEventListener(ev, fn);
+  on('#provSel', 'change', e => { S.provider = e.target.value; saveS(); });
+  on('#ltUrl', 'change', e => { S.ltUrl = e.target.value.trim(); saveS(); });
+  on('#ltKey', 'change', e => { S.ltKey = e.target.value.trim(); saveS(); });
+  on('#mmAllow', 'change', e => { S.mmAllow = e.target.checked; saveS(); });
+  on('#autoSpeak', 'change', e => { S.autoSpeak = e.target.checked; saveS(); });
+  $('#readAnswers').checked = S.readAnswers;
+  on('#readAnswers', 'change', e => { S.readAnswers = e.target.checked; saveS(); });
+  on('#rate', 'input', e => { S.rate = +e.target.value; $('#rateVal').textContent = S.rate + '×'; saveS(); });
+  on('#testBtn', 'click', async () => {
+    const out = $('#testOut'); out.textContent = 'Testing…';
+    try { const r = await translate('Where does it hurt?', 'en', S.lang); out.innerHTML = `<span class="status-dot ok"></span>${esc(r.text)} <br>via ${esc(r.via)}`; }
+    catch (e) { out.innerHTML = `<span class="status-dot bad"></span>${esc(e.message)}`; }
+  });
+  const sr = !!SR, tts = 'speechSynthesis' in window;
+  $('#speechSupport').innerHTML = `<span class="status-dot ${sr ? 'ok' : 'bad'}"></span>Listening ${sr ? 'supported' : 'not supported in this browser'}<br>
+    <span class="status-dot ${tts ? 'ok' : 'bad'}"></span>Speaking aloud ${tts ? 'supported' : 'not supported'}`;
+}
+function applyTheme(){ document.documentElement.dataset.theme = S.theme;
+  document.querySelector('meta[name=theme-color]').content = S.theme === 'dark' ? '#0b1220' : '#f3f5f9'; }
+
+/* ---------- Wire up ---------- */
+function showView(v){
+  document.querySelectorAll('.view').forEach(s => s.classList.toggle('active', s.id === 'view-' + v));
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  window.scrollTo(0, 0);
+}
+function init(){
+  applyTheme(); renderPickers(); updateLangLabels(); renderList(); bindSettings(); renderLog();
+  $('#langSel').addEventListener('change', e => { S.lang = e.target.value; saveS(); updateLangLabels(); renderList(); });
+  $('#catSel').addEventListener('change', e => { S.cat = e.target.value; saveS(); $('#search').value = ''; renderList(); window.scrollTo(0, 0); });
+  $('#search').addEventListener('input', renderList);
+  $('#list').addEventListener('click', e => { const b = e.target.closest('.phrase'); if (b) openSheet(+b.dataset.i); });
+  $('#sClose').onclick = closeSheet;
+  $('#sSpeak').onclick = () => speakCurrent();
+  $('#sSlow').onclick = () => speakCurrent(Math.max(0.5, S.rate - 0.25));
+  $('#sPrev').onclick = () => { stopListening(); if (view.idx > 0) { view.idx--; renderSheet(); if (S.autoSpeak) speakCurrent(); } };
+  $('#sNext').onclick = () => { stopListening(); if (view.idx < view.list.length - 1) { view.idx++; renderSheet(); if (S.autoSpeak) speakCurrent(); } else closeSheet(); };
+  $('#sAnswer').addEventListener('click', e => {
+    const ans = e.target.closest('[data-ans]');
+    if (ans) { const v = ans.dataset.ans; recordAnswer(/^\d+$/.test(v) ? 'Pain ' + v + ' / 10' : UI_TR[v].en.toUpperCase()); return; }
+    const li = e.target.closest('[data-listen]'); if (li) { sheetListen(li); return; }
+    if (e.target.id === 'pointSave') { const v = $('#pointNote').value.trim(); if (v) recordAnswer('Points to: ' + v); }
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').classList.contains('hidden')) closeSheet(); });
+  $('#tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showView(b.dataset.view); });
+  $('#themeBtn').onclick = () => { S.theme = S.theme === 'dark' ? 'light' : 'dark'; saveS(); applyTheme(); };
+  $('#micPatient').onclick = e => liveListen(e.currentTarget, 'patient');
+  $('#micMe').onclick = e => liveListen(e.currentTarget, 'me');
+  $('#typeForm').addEventListener('submit', e => { e.preventDefault(); const v = $('#typeIn').value.trim(); if (v) { $('#typeIn').value = ''; responderSays(v); } });
+  $('#copyLog').onclick = async () => { if (!log.length) return toast('Nothing to copy yet.');
+    try { await navigator.clipboard.writeText(logText()); toast('Copied. Paste into your report.'); } catch { toast('Copy blocked by the browser.'); } };
+  $('#clearLog').onclick = () => $('#confirm').classList.remove('hidden');
+  $('#confNo').onclick = () => $('#confirm').classList.add('hidden');
+  $('#confYes').onclick = () => { log = []; updateBadge(); $('#confirm').classList.add('hidden'); };
+  if (!store.get('ack', false)) $('#modal').classList.remove('hidden');
+  $('#modalOk').onclick = () => { store.set('ack', true); $('#modal').classList.add('hidden'); };
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+init();
+</script>
+</body>
+</html>
