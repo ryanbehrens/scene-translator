@@ -358,7 +358,7 @@ async function viaLibre(text, from, to){
     const body = { q:text, source:s, target:t, format:'text' };
     if (S.ltKey) body.api_key = S.ltKey;
     try {
-      const r = await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+      const r = await fetchT(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
       const j = await r.json().catch(() => ({}));
       if (r.ok && j.translatedText) return j.translatedText;
       lastErr = new Error(j.error || ('LibreTranslate HTTP ' + r.status));
@@ -366,20 +366,22 @@ async function viaLibre(text, from, to){
   }
   throw lastErr;
 }
+const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.userAgentData && navigator.userAgentData.mobile);
+const withTimeout = (pr, ms, msg) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error(msg)), ms))]);
 async function viaChrome(text, from, to){
   if (!('Translator' in self)) throw new Error('Chrome on-device translation not available on this device');
   const k = from.c + '>' + to.c;
   if (!chromeTranslators[k]) {
     const opts = { sourceLanguage: from.c, targetLanguage: to.c };
-    const a = await Translator.availability(opts);
-    if (a === 'unavailable') throw new Error('Chrome cannot translate this language pair');
-    chromeTranslators[k] = await Translator.create(opts);
+    const a = await withTimeout(Translator.availability(opts), 3000, 'Chrome translator not responding');
+    if (a !== 'available') throw new Error('Chrome translator not ready for this language (' + a + ')');
+    chromeTranslators[k] = await withTimeout(Translator.create(opts), 5000, 'Chrome translator not responding');
   }
-  return chromeTranslators[k].translate(text);
+  return withTimeout(chromeTranslators[k].translate(text), 8000, 'Chrome translator took too long');
 }
 async function viaMyMemory(text, from, to){
   const u = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + from.mm + '|' + to.mm;
-  const r = await fetch(u); const j = await r.json();
+  const r = await fetchT(u); const j = await r.json();
   if (j.responseStatus != 200 || !j.responseData) throw new Error(j.responseDetails || 'MyMemory error');
   const div = document.createElement('textarea'); div.innerHTML = j.responseData.translatedText; return div.value;
 }
@@ -388,7 +390,7 @@ function providerOrder(){
   if (S.provider !== 'auto') return [S.provider];
   const o = [];
   if (S.ltUrl) o.push('libre');
-  if ('Translator' in self) o.push('chrome');
+  if ('Translator' in self && !IS_MOBILE) o.push('chrome');
   if (S.mmAllow) o.push('mymemory');
   return o;
 }
@@ -441,33 +443,53 @@ const PLAY_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" st
 /* ---------- Speech recognition ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null;
-function stopListening(){ if (rec) { try { rec.stop(); } catch {} } }
+function stopListening(){ if (rec) rec.finish(); }
+/* Robust listener: phones (esp. iPhone Safari) often never mark speech "final" and never fire "end".
+   So we: keep the latest words heard, auto-finish after ~2s of silence, give up after 10s of no speech,
+   cap at 30s, and force-finish if the browser never reports that it stopped. */
 function listen(langC, { onInterim, onDone, onError }){
-  if (!SR) { onError('Speech recognition is not supported in this browser. Use Safari on iPhone or Chrome on Android.'); return; }
-  if (rec) { stopListening(); return; }
+  if (!SR) { onError('Speech recognition is not supported in this browser. Use Safari on iPhone or Chrome on Android.'); onDone('', true); return; }
+  if (rec) { rec.finish(); return; }
   try { speechSynthesis.cancel(); } catch {}
   const r = new SR();
   r.lang = langBy(langC).sr; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
-  let finalText = '', errored = false;
+  let latest = '', done = false, errored = false, silenceT, noSpeechT, maxT, forceT;
+  const clear = () => [silenceT, noSpeechT, maxT, forceT].forEach(clearTimeout);
+  const end = () => { if (done) return; done = true; clear(); rec = null; onDone(latest.trim(), errored); };
+  const finish = () => { if (done) return; try { r.stop(); } catch {} clearTimeout(forceT); forceT = setTimeout(end, 1500); };
   r.onresult = e => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const res = e.results[i];
-      if (res.isFinal) finalText += res[0].transcript + ' '; else interim += res[0].transcript;
-    }
-    onInterim && onInterim((finalText + interim).trim());
+    let t = '';
+    for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript + ' ';
+    latest = t.replace(/\s+/g, ' ').trim();
+    onInterim && onInterim(latest);
+    clearTimeout(noSpeechT);
+    clearTimeout(silenceT); silenceT = setTimeout(finish, 2000);
   };
   r.onerror = e => {
+    if (e.error === 'aborted') return;
+    if (e.error === 'no-speech' && latest) return;
     errored = true;
-    const m = { 'not-allowed':'Microphone blocked. Allow microphone access for this site in your browser settings.',
-      'service-not-allowed':'Microphone blocked. Allow microphone access for this site in your browser settings.',
-      'no-speech':'Didn\'t hear anything. Tap and try again.', 'network':'Speech recognition needs an internet connection.',
-      'language-not-supported':'This device can\'t recognize speech in that language. Use tap answers or typing instead.',
-      'aborted':'' }[e.error];
-    if (m !== '') onError(m || ('Speech error: ' + e.error));
+    const m = { 'not-allowed':'Microphone blocked. Allow microphone access for this site (Settings → Safari → Microphone on iPhone).',
+      'service-not-allowed':'Speech recognition is turned off. On iPhone, turn on Settings → General → Keyboard → Enable Dictation.',
+      'audio-capture':'No microphone available. Close other apps using the mic and try again.',
+      'no-speech':'Didn\'t hear anything. Tap Listen and hold the phone closer to the patient.',
+      'network':'Speech recognition needs an internet connection.',
+      'language-not-supported':'This device can\'t recognize speech in that language. Use tap answers or typing instead.' }[e.error];
+    onError(m || ('Speech error: ' + e.error));
   };
-  r.onend = () => { rec = null; onDone(finalText.trim(), errored); };
-  try { r.start(); rec = r; } catch (e) { rec = null; onError(e.message); }
+  r.onend = end;
+  rec = { finish };
+  try { r.start(); } catch (e) { errored = true; onError(e.message); end(); return; }
+  noSpeechT = setTimeout(() => { if (!latest) { onError('Didn\'t hear anything. Tap Listen and hold the phone closer to the patient.'); finish(); } }, 10000);
+  maxT = setTimeout(finish, 30000);
+}
+
+/* ---------- Network helper: never hang forever ---------- */
+async function fetchT(url, opts = {}, ms = 10000){
+  const c = new AbortController(); const t = setTimeout(() => c.abort(), ms);
+  try { return await fetch(url, { ...opts, signal: c.signal }); }
+  catch (e) { throw new Error(e.name === 'AbortError' ? 'Translation service took too long. Check signal and try again.' : 'Could not reach translation service.'); }
+  finally { clearTimeout(t); }
 }
 
 /* ---------- Phrase text helpers ---------- */
@@ -612,7 +634,7 @@ function sheetListen(btn){
   const box = btn.parentElement.querySelector('.lb') || btn.nextElementSibling;
   const lang = L();
   if (rec) { stopListening(); return; }
-  btn.classList.add('mic-on'); const old = btn.innerHTML; btn.innerHTML = '■ Stop listening';
+  btn.classList.add('mic-on'); const old = btn.innerHTML; btn.innerHTML = '✓ Done — translate now';
   box.innerHTML = `<div class="listen-box"><div class="orig" dir="${lang.rtl ? 'rtl' : 'ltr'}">${esc(uiOf('speak', lang.c) || 'Listening…')}</div><div class="src">Listening for ${esc(lang.name)}…</div></div>`;
   listen(lang.c, {
     onInterim: t => { box.querySelector('.orig').textContent = t; },
@@ -654,12 +676,13 @@ function liveListen(btn, who){
   const lang = L(); const src = who === 'patient' ? lang.c : 'en';
   if (rec) { stopListening(); return; }
   btn.classList.add('mic-on');
+  const sm = btn.querySelector('small'), smOld = sm.textContent; sm.textContent = 'Listening… tap when done';
   const b = addBubble(`<div class="who">${who === 'patient' ? 'Patient (' + esc(lang.name) + ')' : 'You (English)'}</div><div class="sub">Listening…</div>`, who !== 'patient');
   listen(src, {
     onInterim: t => { b.querySelector('.sub').textContent = t; },
     onError: m => toast(m, 5000),
     onDone: async (text) => {
-      btn.classList.remove('mic-on');
+      btn.classList.remove('mic-on'); sm.textContent = smOld;
       if (!text) { b.remove(); return; }
       if (who === 'patient') {
         b.querySelector('.sub').textContent = text; b.querySelector('.sub').dir = lang.rtl ? 'rtl' : 'ltr';
