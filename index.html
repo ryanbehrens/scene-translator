@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
 <title>Scene Translator</title>
 <meta name="theme-color" content="#0b1220">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,7 +23,7 @@
   --bg:#f3f5f9;--surface:#ffffff;--surface2:#eef1f6;--line:#d9dfe8;--text:#0f172a;--muted:#5b6578;--shadow:0 6px 20px rgba(15,23,42,.10);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans","Noto Sans Arabic","Noto Sans SC",sans-serif}
+html,body{margin:0;background:var(--bg);color:var(--text);font:17px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans","Noto Sans Arabic","Noto Sans SC",sans-serif}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 .hidden{display:none!important}
@@ -32,8 +33,8 @@ button{cursor:pointer}
   padding:calc(10px + var(--sat)) 16px 10px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px}
 .brand svg{width:34px;height:34px;flex:none}
-.brand h1{font-size:17px;margin:0;letter-spacing:.2px}
-.brand p{margin:0;font-size:12px;color:var(--muted)}
+.brand h1{font-size:19px;margin:0;letter-spacing:.2px}
+.brand p{margin:0;font-size:14px;color:var(--muted)}
 .icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
 .icon-btn svg{width:20px;height:20px}
 
@@ -44,37 +45,41 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .pickers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:420px){.pickers{grid-template-columns:1fr}}
 .picker{display:block}
-.picker span{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 6px 2px}
-.picker select{width:100%;height:54px;padding:0 42px 0 14px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);
-  font-size:17px;font-weight:600;appearance:none;-webkit-appearance:none;
+.picker span{display:block;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 7px 2px}
+.picker select{width:100%;height:64px;padding:0 46px 0 16px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);
+  font-size:20px;font-weight:700;appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2395a3ba' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 16px center}
 .picker select:focus{outline:2px solid var(--blue);outline-offset:1px}
-.search{margin:12px 0 8px;position:relative}
-.search input{width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);padding:0 14px 0 40px;font-size:16px}
-.search svg{position:absolute;left:13px;top:13px;width:20px;height:20px;color:var(--muted)}
+/* Open dropdown list (desktop/Android popups honor this; iPhone uses its own large native picker) */
+.picker select option,.picker select optgroup{font-size:19px;font-weight:600;background:var(--surface);color:var(--text)}
+.picker select optgroup{font-size:15px;color:var(--muted)}
+.search{margin:14px 0 8px;position:relative}
+.search input{width:100%;height:56px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);padding:0 14px 0 46px;font-size:18px}
+.search svg{position:absolute;left:14px;top:17px;width:22px;height:22px;color:var(--muted)}
 
-.note{font-size:13px;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+.note{font-size:15px;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
 .note.warn{border-color:color-mix(in srgb,var(--warn) 50%,var(--line));color:var(--text)}
 
 /* Phrase list */
 .list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .group-h{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 2px 2px}
-.phrase{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);min-height:64px}
+.phrase{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:14px 16px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);min-height:64px}
 .phrase:active{transform:scale(.99);background:var(--surface2)}
 .tag{flex:none;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:16px;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
 .tag.blank{background:var(--surface2);color:var(--muted)}
 .tag.blank svg{width:16px;height:16px}
 .phrase .txt{flex:1;min-width:0}
-.phrase .en{font-weight:600;font-size:16.5px}
-.phrase .tr{color:var(--muted);font-size:14.5px;margin-top:3px}
-.pill{flex:none;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.phrase .en{font-weight:650;font-size:19px;line-height:1.3}
+.phrase .tr{color:var(--muted);font-size:17px;margin-top:4px}
+.group-h{font-size:14px!important}
+.pill{display:inline-block;margin-top:8px;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
 .pill.yn{color:var(--blue)}.pill.scale{color:var(--warn)}.pill.open,.pill.point{color:var(--ok)}
 
 /* Bottom tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);
   background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + var(--sab))}
-.tabs button{border:0;background:none;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--muted);border-radius:10px}
+.tabs button{border:0;background:none;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:13px;font-weight:600;color:var(--muted);border-radius:10px}
 .tabs button svg{width:24px;height:24px}
 .tabs button.active{color:var(--accent)}
 .tabs .badge{position:absolute;margin-left:22px;margin-top:-2px;background:var(--accent);color:#fff;font-size:10px;border-radius:999px;padding:1px 6px}
@@ -92,13 +97,13 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .sheet-top{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + var(--sat)) 12px 10px;border-bottom:1px solid var(--line)}
 .sheet-top .meta{font-size:13px;color:var(--muted);font-weight:600}
 .sheet-body{flex:1;overflow:auto;padding:16px 16px 20px;max-width:760px;width:100%;margin:0 auto}
-.s-en{font-size:15px;color:var(--muted);font-weight:600;display:flex;gap:8px;align-items:flex-start}
+.s-en{font-size:18px;color:var(--muted);font-weight:600;display:flex;gap:8px;align-items:flex-start}
 .s-en .lbl{flex:none;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;border:1px solid var(--line);border-radius:6px;padding:2px 6px;margin-top:1px}
 .s-tr{font-size:clamp(28px,7.4vw,44px);line-height:1.22;font-weight:750;margin:14px 0 18px;word-wrap:break-word}
 .s-actions{display:flex;gap:10px;flex-wrap:wrap}
 .s-actions .btn{flex:1}
 .answer{margin-top:22px}
-.answer h3{margin:0 0 10px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.answer h3{margin:0 0 10px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .yn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .yn button{min-height:96px;border-radius:16px;border:0;color:#fff;font-weight:800;font-size:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .yn button small{font-size:13px;font-weight:600;opacity:.85}
@@ -131,13 +136,13 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .bubble .row button{border:1px solid var(--line);background:var(--surface2);border-radius:9px;padding:6px 10px;font-size:13px;font-weight:600}
 .live-controls{position:sticky;bottom:calc(76px + var(--sab));margin-top:14px;display:grid;gap:10px;background:var(--bg);padding-top:8px}
 .mics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mic{min-height:84px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-weight:800;font-size:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.mic{min-height:90px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-weight:800;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 .mic svg{width:26px;height:26px}
-.mic small{font-weight:600;color:var(--muted);font-size:12px}
+.mic small{font-weight:600;color:var(--muted);font-size:14px}
 .mic.patient{border-color:color-mix(in srgb,var(--ok) 50%,var(--line))}
 .mic.me{border-color:color-mix(in srgb,var(--blue) 50%,var(--line))}
 .type-row{display:flex;gap:8px}
-.type-row input{flex:1;height:50px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-size:16px}
+.type-row input{flex:1;height:54px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-size:18px}
 .empty{color:var(--muted);text-align:center;padding:24px 10px;font-size:14.5px}
 
 /* Log */
@@ -152,11 +157,11 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
 .card h3{margin:0 0 8px;font-size:15px}
 .field{margin:10px 0}
-.field label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px}
-.field input[type=text],.field input[type=url],.field input[type=password],.field select{width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);padding:0 12px;font-size:16px}
+.field label{display:block;font-size:15px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.field input[type=text],.field input[type=url],.field input[type=password],.field select{width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);padding:0 12px;font-size:18px}
 .switch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0}
 .switch input{width:22px;height:22px;accent-color:var(--accent)}
-.small{font-size:13px;color:var(--muted)}
+.small{font-size:15px;color:var(--muted)}
 .small a{color:var(--blue)}
 .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--muted)}
 .status-dot.ok{background:var(--ok)}.status-dot.bad{background:var(--bad)}
@@ -193,7 +198,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
     </div>
     <div class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="search" type="search" placeholder="Search all phrases (e.g. allergic, pain)" autocomplete="off">
+      <input id="search" type="search" placeholder="Search phrases…" autocomplete="off">
     </div>
     <div id="mtNote" class="note warn hidden"></div>
     <div id="list" class="list"></div>
@@ -537,10 +542,10 @@ function renderList(){
     if (!searching && names && p.tag && p.tag !== lastTag) { html += `<div class="group-h">${p.tag} — ${names[p.tag]}</div>`; lastTag = p.tag; }
     const tr = trOf(p, lang.c);
     html += `<button class="phrase" data-i="${i}">
-      <span class="tag ${p.tag ? '' : 'blank'}">${p.tag ? esc(p.tag) : ICON_LIST}</span>
+      ${p.tag ? `<span class="tag">${esc(p.tag)}</span>` : ''}
       <span class="txt"><div class="en">${esc(p.en)}</div>
-      <div class="tr" ${lang.rtl ? 'dir="rtl"' : ''} lang="${lang.c}" data-en="${esc(p.en)}">${tr ? esc(tr) : 'Translating…'}</div></span>
-      <span class="pill ${p.type}">${TYPE_LBL[p.type]}</span></button>`;
+      <div class="tr" ${lang.rtl ? 'dir="rtl"' : ''} lang="${lang.c}" data-en="${esc(p.en)}">${tr ? esc(tr) : 'Translating…'}</div>
+      <span class="pill ${p.type}">${TYPE_LBL[p.type]}</span></span></button>`;
   });
   $('#list').innerHTML = html;
   const note = $('#mtNote');
