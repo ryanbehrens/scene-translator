@@ -91,6 +91,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
 .btn.block{width:100%}
 .btn:disabled{opacity:.5}
+.btn.playing{outline:3px solid var(--blue);outline-offset:2px}
 
 /* Sheet (phrase detail) */
 .sheet{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column}
@@ -278,7 +279,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
     <div class="s-tr" id="sTr"></div>
     <div class="s-actions">
       <button id="sSpeak" class="btn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>Speak</button>
-      <button id="sSlow" class="btn">Slower</button>
+      <button id="sSlow" class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>Slow</button>
     </div>
     <div id="sAnswer" class="answer"></div>
     <div id="sResult" class="result hidden"></div>
@@ -424,12 +425,13 @@ function pickVoice(lang){
   }
   return null;
 }
-function speak(text, langC, rate = S.rate){
+function speak(text, langC, rate = S.rate, onEnd){
   if (!('speechSynthesis' in window)) { toast('This browser cannot speak aloud. Show the screen to the patient.'); return; }
   const lang = langBy(langC);
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = lang.tts[0]; u.rate = rate;
+  if (onEnd) { u.onend = onEnd; u.onerror = onEnd; }
   const v = pickVoice(lang);
   if (v) u.voice = v;
   else if (voices.length) { toast('No ' + lang.name + ' voice on this device. Show the screen to the patient.'); return; }
@@ -583,9 +585,22 @@ function openSheet(i){
   document.body.style.overflow = 'hidden';
   if (S.autoSpeak) speakCurrent();
 }
-function closeSheet(){ stopListening(); try{ speechSynthesis.cancel(); }catch{} $('#sheet').classList.add('hidden'); document.body.style.overflow = ''; }
+function closeSheet(){ stopListening(); resetSpeakBtns(); try{ speechSynthesis.cancel(); }catch{} $('#sheet').classList.add('hidden'); document.body.style.overflow = ''; }
 function curP(){ return view.list[view.idx]; }
-function speakCurrent(rate){ const { p } = curP(); const t = trOf(p, S.lang); if (t) speak(t, S.lang, rate); }
+const SPEAK_LBL = { sSpeak: null, sSlow: null }; let speakTok = 0;
+function resetSpeakBtns(){ ['sSpeak','sSlow'].forEach(id => { const b = $('#' + id); if (SPEAK_LBL[id]) b.innerHTML = SPEAK_LBL[id]; b.classList.remove('playing'); }); }
+function speakCurrent(slow){
+  const { p } = curP(); const t = trOf(p, S.lang); if (!t) return;
+  ['sSpeak','sSlow'].forEach(id => { if (!SPEAK_LBL[id]) SPEAK_LBL[id] = $('#' + id).innerHTML; });
+  resetSpeakBtns();
+  const id = slow ? 'sSlow' : 'sSpeak', b = $('#' + id);
+  b.classList.add('playing'); b.textContent = slow ? 'Playing slowly…' : 'Speaking…';
+  // "Slower" is clearly slower: about half of normal speed
+  const rate = slow ? Math.max(0.45, S.rate * 0.6) : S.rate;
+  const tok = ++speakTok, done = () => { if (tok === speakTok) resetSpeakBtns(); };
+  speak(t, S.lang, rate, done);
+  setTimeout(done, 15000); // safety reset if the phone never reports "finished"
+}
 function renderSheet(){
   const { p, cat } = curP(); const lang = L();
   const tr = trOf(p, lang.c);
@@ -749,8 +764,8 @@ function init(){
   $('#search').addEventListener('input', renderList);
   $('#list').addEventListener('click', e => { const b = e.target.closest('.phrase'); if (b) openSheet(+b.dataset.i); });
   $('#sClose').onclick = closeSheet;
-  $('#sSpeak').onclick = () => speakCurrent();
-  $('#sSlow').onclick = () => speakCurrent(Math.max(0.5, S.rate - 0.25));
+  $('#sSpeak').onclick = () => speakCurrent(false);
+  $('#sSlow').onclick = () => speakCurrent(true);
   $('#sPrev').onclick = () => { stopListening(); if (view.idx > 0) { view.idx--; renderSheet(); if (S.autoSpeak) speakCurrent(); } };
   $('#sNext').onclick = () => { stopListening(); if (view.idx < view.list.length - 1) { view.idx++; renderSheet(); if (S.autoSpeak) speakCurrent(); } else closeSheet(); };
   $('#sAnswer').addEventListener('click', e => {
