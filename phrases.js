@@ -400,3 +400,8 @@ catById('trauma').phrases.unshift(...aoCopy());
     PJ('', 'color', 'Are you coughing up mucus? Tap its color.', '¿Está sacando flema al toser? Toque el color.', '您咳痰吗？请点击痰的颜色。', 'Bạn có ho ra đờm không? Hãy chạm vào màu của đờm.', 'May plema po ba kapag umuubo kayo? Pindutin ang kulay nito.', 'هل يخرج بلغم مع السعال؟ اضغط على لونه.', 'Вы откашливаете мокроту? Нажмите на её цвет.', 'せきでたんが出ますか？たんの色をタップしてください。'),
     PJ('', 'yn', 'Does it hurt when you breathe?', '¿Le duele al respirar?', '呼吸时会疼吗？', 'Bạn có đau khi thở không?', 'Masakit po ba kapag humihinga kayo?', 'هل يؤلمك التنفس؟', 'Вам больно дышать?', '息をすると痛みますか？'));
 }
+
+/* ---- v2.5: Basics — pain check near the top (replaces "Where does it hurt? Point to it.") ---- */
+replacePhrase(catById('basics').phrases, 'Where does it hurt? Point to it.',
+  PJ('', 'yn', 'Are you having any pain?', '¿Tiene algún dolor?', '您有哪里疼吗？', 'Bạn có bị đau ở đâu không?', 'May nararamdaman po ba kayong sakit?', 'هل تشعر بأي ألم؟', 'У вас что-нибудь болит?', 'どこか痛みはありますか？'),
+  PJ('', 'point', 'Where are you having pain? Point to it.', '¿Dónde tiene el dolor? Señálelo.', '您哪里疼？请指给我看。', 'Bạn đau ở đâu? Hãy chỉ cho tôi.', 'Saan po kayo may nararamdamang sakit? Ituro po ninyo.', 'أين تشعر بالألم؟ أشر إلى المكان.', 'Где у вас болит? Покажите, пожалуйста.', 'どこが痛いですか？指でさしてください。'));
