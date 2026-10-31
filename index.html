@@ -8,10 +8,12 @@
 <meta name="theme-color" content="#0d3270">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="application-name" content="Scene Translator">
 <meta name="apple-mobile-web-app-title" content="Scene Translator">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
 <style>
 :root{
   --bg:#0b1220;--surface:#131c2e;--surface2:#1a2539;--line:#26334b;--text:#eef2f8;--muted:#95a3ba;
@@ -65,6 +67,13 @@ main{position:relative;z-index:1;padding:12px 14px calc(96px + var(--sab));max-w
 .search input{width:100%;height:56px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);padding:0 14px 0 46px;font-size:18px}
 .search svg{position:absolute;left:14px;top:17px;width:22px;height:22px;color:var(--muted)}
 
+.installbar{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 10px 10px 14px;border-radius:12px;
+  border:1px solid color-mix(in srgb,var(--accent) 55%,var(--line));background:color-mix(in srgb,var(--accent) 14%,var(--surface));font-size:15px}
+.installbar svg{flex:none;width:24px;height:24px;color:var(--accent-text)}
+.installbar span{flex:1}
+.installbar .x{border:0;background:none;color:var(--muted);font-size:18px;width:34px;height:34px;flex:none}
+#installSteps ol{padding-left:22px}#installSteps li{margin:10px 0;line-height:1.45}
+.ios-share{display:inline-block;width:20px;height:20px;vertical-align:-4px;color:var(--accent-text)}
 .micbar{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:0 0 12px;padding:12px 14px;border-radius:12px;
   border:1px solid color-mix(in srgb,var(--warn) 60%,var(--line));background:color-mix(in srgb,var(--warn) 14%,var(--surface));font-size:16px}
 .micbar svg{flex:none;width:24px;height:24px;color:var(--warn)}
@@ -220,6 +229,12 @@ a.btn{color:var(--text);text-decoration:none}
 <main>
   <!-- PHRASES -->
   <section id="view-phrases" class="view active">
+    <div class="installbar hidden" id="installBar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M12 7v7m-3-3 3 3 3-3M10 18h4"/></svg>
+      <span>Add Scene Translator to your home screen for one-tap access.</span>
+      <button class="btn" id="installBarBtn" style="min-height:40px;padding:0 12px;font-size:15px">Install</button>
+      <button class="x" id="installBarX" aria-label="Dismiss">✕</button>
+    </div>
     <button class="micbar hidden" data-micbar><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Microphone not allowed yet. <b>Tap to allow</b></span></button>
     <div class="pickers">
       <label class="picker"><span>Patient language</span><select id="langSel"></select></label>
@@ -264,6 +279,13 @@ a.btn{color:var(--text);text-decoration:none}
       <button id="micCheck" class="btn primary block" style="min-height:58px;font-size:18px;margin-top:6px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Allow microphone access</button>
       <p class="small" style="margin-top:8px">Tap to show your phone's microphone permission pop-up. Do this before a call so listening works right away.</p>
+    </div>
+    <div class="card" id="installCard">
+      <h3>Install on your phone</h3>
+      <p class="small">Status: <span class="status-dot" id="instDot"></span><b id="instState">Not installed</b></p>
+      <button id="installBtn" class="btn primary block" style="min-height:58px;font-size:18px;margin-top:6px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M12 7v7m-3-3 3 3 3-3"/></svg>Add to home screen</button>
+      <p class="small" style="margin-top:8px">Opens full screen like a regular app, with the Scene Translator icon. Built-in phrases work even with no signal.</p>
     </div>
     <div class="card">
       <h3>Translation service</h3>
@@ -354,12 +376,19 @@ a.btn{color:var(--text);text-decoration:none}
     <button id="micClose" class="btn block" style="margin-top:12px">Close</button>
   </div>
 </div>
+<div id="installHelp" class="modal hidden">
+  <div class="modal-box">
+    <h2>Add to your home screen</h2>
+    <div id="installSteps"></div>
+    <button id="installClose" class="btn primary block" style="margin-top:12px">Got it</button>
+  </div>
+</div>
 <div id="toast" role="status"></div>
 
 <script src="phrases.js?v=6"></script>
 <script>
 "use strict";
-const APP_VERSION = '2.6';
+const APP_VERSION = '2.7';
 // Support link shown quietly in Settings → About. Leave empty ('') to hide it (e.g. for a department version).
 const SUPPORT_URL = 'https://paypal.me/RBehrens42';
 /* ---------- Languages ---------- */
@@ -620,6 +649,47 @@ async function requestMic(){
     return false;
   }
 }
+
+/* ---------- Install (Progressive Web App) ---------- */
+let installEvt = null;
+const SHARE_ICON = '<svg class="ios-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>';
+const isInstalled = () => IS_STANDALONE || matchMedia('(display-mode: standalone)').matches;
+function updateInstallUI(){
+  const inst = isInstalled();
+  const st = document.getElementById('instState'), dot = document.getElementById('instDot'), btn = document.getElementById('installBtn');
+  if (st) st.textContent = inst ? 'Installed — you\'re using the app' : 'Not installed';
+  if (dot) dot.className = 'status-dot' + (inst ? ' ok' : '');
+  if (btn) btn.classList.toggle('hidden', inst);
+  const bar = document.getElementById('installBar');
+  if (bar) bar.classList.toggle('hidden', inst || store.get('installDismissed', false));
+}
+function installStepsHTML(){
+  if (IS_IOS && !IS_CHROME_IOS) return `<ol>
+    <li>Make sure this page is open in <b>Safari</b>.</li>
+    <li>Tap the <b>Share</b> button ${SHARE_ICON} (bottom of the screen, or top on iPad).</li>
+    <li>Scroll down and tap <b>Add to Home Screen</b>.</li>
+    <li>Tap <b>Add</b>. The Scene Translator icon appears on your home screen.</li></ol>`;
+  if (IS_CHROME_IOS) return `<ol>
+    <li>Tap the <b>Share</b> button ${SHARE_ICON} in Chrome's address bar.</li>
+    <li>Tap <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol>
+    <p class="small">For the best listening support on iPhone, open the app in <b>Safari</b> and add it from there.</p>`;
+  if (IS_ANDROID) return `<ol>
+    <li>Tap Chrome's menu <b>⋮</b> (top right).</li>
+    <li>Tap <b>Add to Home screen</b> or <b>Install app</b>.</li>
+    <li>Tap <b>Install</b>. The icon appears on your home screen.</li></ol>`;
+  return `<ol><li>In Chrome or Edge, click the install icon at the right end of the address bar, or open the menu and choose <b>Install Scene Translator</b>.</li></ol>`;
+}
+async function installApp(){
+  if (installEvt) {
+    installEvt.prompt();
+    try { const r = await installEvt.userChoice; if (r && r.outcome === 'accepted') toast('Installing… look for the icon on your home screen.', 4000); } catch {}
+    installEvt = null; return;
+  }
+  $('#installSteps').innerHTML = installStepsHTML();
+  $('#installHelp').classList.remove('hidden');
+}
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; updateInstallUI(); });
+window.addEventListener('appinstalled', () => { installEvt = null; store.set('installDismissed', true); updateInstallUI(); toast('Installed! Open Scene Translator from your home screen.', 4500); });
 
 /* ---------- Speech recognition ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -960,6 +1030,10 @@ function showView(v){
   window.scrollTo(0, 0);
 }
 function init(){
+  updateInstallUI();
+  $('#installBtn').onclick = installApp; $('#installBarBtn').onclick = installApp;
+  $('#installBarX').onclick = () => { store.set('installDismissed', true); updateInstallUI(); };
+  $('#installClose').onclick = () => $('#installHelp').classList.add('hidden');
   watchMic();
   $('#micAllow').onclick = async () => {
     const btn = $('#micAllow'); btn.disabled = true; btn.textContent = 'Asking your phone…';
