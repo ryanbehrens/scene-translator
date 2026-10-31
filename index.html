@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}</style>
 <title>Scene Translator</title>
-<meta name="theme-color" content="#0b1220">
+<meta name="theme-color" content="#0d3270">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Scene Translator">
@@ -15,11 +15,12 @@
 <style>
 :root{
   --bg:#0b1220;--surface:#131c2e;--surface2:#1a2539;--line:#26334b;--text:#eef2f8;--muted:#95a3ba;
-  --accent:#e0323f;--accent-ink:#fff;--blue:#3b82f6;--ok:#16a34a;--bad:#dc2626;--warn:#f59e0b;
+  --accent:#1976d2;--accent-ink:#fff;--accent-text:#5aa9ff;--hdr1:#0d3270;--hdr2:#1565c0;--blue:#3b82f6;--ok:#16a34a;--bad:#dc2626;--warn:#f59e0b;
   --radius:14px;--shadow:0 6px 24px rgba(0,0,0,.35);
   --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
 }
 [data-theme="light"]{
+  --accent-text:#1565c0;
   --bg:#f3f5f9;--surface:#ffffff;--surface2:#eef1f6;--line:#d9dfe8;--text:#0f172a;--muted:#5b6578;--shadow:0 6px 20px rgba(15,23,42,.10);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -30,9 +31,15 @@ button{cursor:pointer}
 
 /* Header */
 .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:calc(10px + var(--sat)) 16px 10px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  padding:calc(10px + var(--sat)) 16px 10px;background:linear-gradient(120deg,var(--hdr1),var(--hdr2));color:#fff;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.top .brand p{color:rgba(255,255,255,.78)!important}
+.top .icon-btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:#fff}
+/* Star of Life watermark: soft overlay, never blocks taps */
+body::after{content:"";position:fixed;inset:0;z-index:15;pointer-events:none;opacity:.07;
+  background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2092.64%2096.3%22%3E%3Cpath%20fill%3D%22%23aab4c3%22%20d%3D%22M57.2%2C96.29h-22.02c-1.39-.09-2.42-1.07-2.42-2.5v-22.26s-18.45%2C10.88-18.45%2C10.88c-1.08.64-2.47.03-3.08-1.02L.47%2C62.81c-.67-1.16-.65-2.38.42-3.26l8.02-4.78%2C11.21-6.58L.91%2C36.75c-1.13-.67-1.09-2.13-.52-3.12L11.21%2C14.9c.66-1.15%2C2.12-1.43%2C3.24-.78l18.29%2C10.59V2.71c0-1.45.84-2.44%2C2.3-2.7h22.29c1.69.07%2C2.59%2C1.28%2C2.59%2C2.9v21.81s18.31-10.63%2C18.31-10.63c.9-.52%2C2.4-.43%2C2.96.53l11.07%2C19.08c.62.99.49%2C2.42-.63%2C3.09l-19.13%2C11.38%2C18.94%2C11.17c1.19.7%2C1.48%2C2.1.81%2C3.27l-10.73%2C18.6c-.43.74-1.01%2C1.24-1.58%2C1.36-.97.2-1.57-.08-2.33-.53l-17.69-10.45-.07%2C22.31c0%2C1.45-1.3%2C2.44-2.66%2C2.39Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M43.57%2C69.03c-2.1-.76-4.06-2.13-5.14-4.18-1.43-2.72-1.12-6.19.7-8.62%2C1.33-1.78%2C3.15-2.85%2C5.25-3.45l6.28-1.8c1.74-.5%2C2.81-2.3%2C2.2-4.11-.32-.96-1.22-1.58-2.21-2.02.88-1.68%2C1.34-3.36%2C1.4-5.39%2C4.99%2C1.95%2C7.42%2C7.06%2C5.43%2C11.81-.87%2C2.07-2.89%2C4.06-5.44%2C4.67l-5.38%2C1.28c-1.42.34-2.47%2C1.05-3.44%2C2.1-1.07%2C1.16-1.2%2C2.78-.04%2C3.97l1.12%2C1.14c-.64%2C1.45-.71%2C2.72-.74%2C4.61Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M49.9%2C49.6l-4.9%2C1.31-.62-20.39c2-1.13%2C4.11-1.51%2C5.98-.23l-.46%2C19.31Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M45.99%2C85.82l-.32-4.12c-1.25.68-2.45%2C1.26-3.08.57-.96-1.06.99-3.61%2C3.64-4.77%2C2.12-.92%2C4.45-1.71%2C4.74-3.72.13-.89-.39-1.58-.85-2.24.64-1.27%2C1.04-2.68%2C1.15-4.2%2C1.04.73%2C1.97%2C1.49%2C2.67%2C2.5%2C1.9%2C2.71%2C1.23%2C6.3-1.21%2C8.46-1.01.9-2.16%2C1.39-3.41%2C1.88l-.25%2C4.36c-.06%2C1.07-.5%2C2.35-1.63%2C2.66-.63.18-1.42-.71-1.47-1.38Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M48.57%2C74.47l-2.98%2C1.83-.39-16.46c1.42-1.04%2C2.85-1.66%2C4.6-1.97l-.47%2C17.18c-.3-.1-.44-.31-.76-.58Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M41.93%2C29.85c-1.3%2C1.04-1.8%2C2.77-1.2%2C4.1s1.74%2C1.97%2C2.86%2C2.56c-.8%2C1.79-.83%2C3.56-.52%2C5.5-3.09-.67-5.48-2.55-6.92-5.26-1.6-3.69-.85-8.04%2C2.1-10.79%2C1.73-1.61%2C3.8-2.53%2C6.08-2.98l-.32-9.44c-.07-2.12%2C1.81-3.82%2C3.89-3.49%2C1.66.26%2C2.87%2C1.81%2C2.82%2C3.48l-.27%2C9.18c3.23-.6%2C5.85-.6%2C7.95%2C1.83.73.84.6%2C1.93-.06%2C2.77-1.61%2C1.59-3.85%2C2.39-6.11%2C1.85-3.22-1.75-7.38-1.65-10.3.69Z%22/%3E%3Ccircle%20fill%3D%22%230b1220%22%20cx%3D%2254.59%22%20cy%3D%2224.87%22%20r%3D%22.69%22/%3E%3C/svg%3E") center 58% / min(80vw,460px) no-repeat}
+[data-theme="light"] body::after{opacity:.06;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2092.64%2096.3%22%3E%3Cpath%20fill%3D%22%23334155%22%20d%3D%22M57.2%2C96.29h-22.02c-1.39-.09-2.42-1.07-2.42-2.5v-22.26s-18.45%2C10.88-18.45%2C10.88c-1.08.64-2.47.03-3.08-1.02L.47%2C62.81c-.67-1.16-.65-2.38.42-3.26l8.02-4.78%2C11.21-6.58L.91%2C36.75c-1.13-.67-1.09-2.13-.52-3.12L11.21%2C14.9c.66-1.15%2C2.12-1.43%2C3.24-.78l18.29%2C10.59V2.71c0-1.45.84-2.44%2C2.3-2.7h22.29c1.69.07%2C2.59%2C1.28%2C2.59%2C2.9v21.81s18.31-10.63%2C18.31-10.63c.9-.52%2C2.4-.43%2C2.96.53l11.07%2C19.08c.62.99.49%2C2.42-.63%2C3.09l-19.13%2C11.38%2C18.94%2C11.17c1.19.7%2C1.48%2C2.1.81%2C3.27l-10.73%2C18.6c-.43.74-1.01%2C1.24-1.58%2C1.36-.97.2-1.57-.08-2.33-.53l-17.69-10.45-.07%2C22.31c0%2C1.45-1.3%2C2.44-2.66%2C2.39Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M43.57%2C69.03c-2.1-.76-4.06-2.13-5.14-4.18-1.43-2.72-1.12-6.19.7-8.62%2C1.33-1.78%2C3.15-2.85%2C5.25-3.45l6.28-1.8c1.74-.5%2C2.81-2.3%2C2.2-4.11-.32-.96-1.22-1.58-2.21-2.02.88-1.68%2C1.34-3.36%2C1.4-5.39%2C4.99%2C1.95%2C7.42%2C7.06%2C5.43%2C11.81-.87%2C2.07-2.89%2C4.06-5.44%2C4.67l-5.38%2C1.28c-1.42.34-2.47%2C1.05-3.44%2C2.1-1.07%2C1.16-1.2%2C2.78-.04%2C3.97l1.12%2C1.14c-.64%2C1.45-.71%2C2.72-.74%2C4.61Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M49.9%2C49.6l-4.9%2C1.31-.62-20.39c2-1.13%2C4.11-1.51%2C5.98-.23l-.46%2C19.31Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M45.99%2C85.82l-.32-4.12c-1.25.68-2.45%2C1.26-3.08.57-.96-1.06.99-3.61%2C3.64-4.77%2C2.12-.92%2C4.45-1.71%2C4.74-3.72.13-.89-.39-1.58-.85-2.24.64-1.27%2C1.04-2.68%2C1.15-4.2%2C1.04.73%2C1.97%2C1.49%2C2.67%2C2.5%2C1.9%2C2.71%2C1.23%2C6.3-1.21%2C8.46-1.01.9-2.16%2C1.39-3.41%2C1.88l-.25%2C4.36c-.06%2C1.07-.5%2C2.35-1.63%2C2.66-.63.18-1.42-.71-1.47-1.38Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M48.57%2C74.47l-2.98%2C1.83-.39-16.46c1.42-1.04%2C2.85-1.66%2C4.6-1.97l-.47%2C17.18c-.3-.1-.44-.31-.76-.58Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M41.93%2C29.85c-1.3%2C1.04-1.8%2C2.77-1.2%2C4.1s1.74%2C1.97%2C2.86%2C2.56c-.8%2C1.79-.83%2C3.56-.52%2C5.5-3.09-.67-5.48-2.55-6.92-5.26-1.6-3.69-.85-8.04%2C2.1-10.79%2C1.73-1.61%2C3.8-2.53%2C6.08-2.98l-.32-9.44c-.07-2.12%2C1.81-3.82%2C3.89-3.49%2C1.66.26%2C2.87%2C1.81%2C2.82%2C3.48l-.27%2C9.18c3.23-.6%2C5.85-.6%2C7.95%2C1.83.73.84.6%2C1.93-.06%2C2.77-1.61%2C1.59-3.85%2C2.39-6.11%2C1.85-3.22-1.75-7.38-1.65-10.3.69Z%22/%3E%3Ccircle%20fill%3D%22%23f3f5f9%22%20cx%3D%2254.59%22%20cy%3D%2224.87%22%20r%3D%22.69%22/%3E%3C/svg%3E")}
 .brand{display:flex;align-items:center;gap:10px}
-.brand svg{width:34px;height:34px;flex:none}
+.brand svg{width:34px;height:37px;flex:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 .brand h1{font-size:19px;margin:0;letter-spacing:.2px}
 .brand p{margin:0;font-size:14px;color:var(--muted)}
 .icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
@@ -58,6 +65,9 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .search input{width:100%;height:56px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);padding:0 14px 0 46px;font-size:18px}
 .search svg{position:absolute;left:14px;top:17px;width:22px;height:22px;color:var(--muted)}
 
+.micbar{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:0 0 12px;padding:12px 14px;border-radius:12px;
+  border:1px solid color-mix(in srgb,var(--warn) 60%,var(--line));background:color-mix(in srgb,var(--warn) 14%,var(--surface));font-size:16px}
+.micbar svg{flex:none;width:24px;height:24px;color:var(--warn)}
 .note{font-size:15px;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
 .note.warn{border-color:color-mix(in srgb,var(--warn) 50%,var(--line));color:var(--text)}
 
@@ -66,7 +76,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .group-h{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin:14px 2px 2px}
 .phrase{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:14px 16px;border-radius:var(--radius);border:1px solid var(--line);background:var(--surface);min-height:64px}
 .phrase:active{transform:scale(.99);background:var(--surface2)}
-.tag{flex:none;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:16px;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.tag{flex:none;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:16px;background:color-mix(in srgb,var(--accent) 22%,transparent);color:var(--accent-text)}
 .tag.blank{background:var(--surface2);color:var(--muted)}
 .tag.blank svg{width:16px;height:16px}
 .phrase .txt{flex:1;min-width:0}
@@ -81,7 +91,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
   background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + var(--sab))}
 .tabs button{border:0;background:none;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:13px;font-weight:600;color:var(--muted);border-radius:10px}
 .tabs button svg{width:24px;height:24px}
-.tabs button.active{color:var(--accent)}
+.tabs button.active{color:var(--accent-text)}
 .tabs .badge{position:absolute;margin-left:22px;margin-top:-2px;background:var(--accent);color:#fff;font-size:10px;border-radius:999px;padding:1px 6px}
 
 /* Buttons */
@@ -128,7 +138,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .result .v{font-size:24px;font-weight:800;margin-top:2px}
 .sheet-nav{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 14px calc(10px + var(--sab));border-top:1px solid var(--line);background:var(--surface)}
 .mic-on{animation:pulse 1.2s infinite;background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,50,63,.55)}70%{box-shadow:0 0 0 14px rgba(224,50,63,0)}100%{box-shadow:0 0 0 0 rgba(224,50,63,0)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(25,118,210,.55)}70%{box-shadow:0 0 0 14px rgba(25,118,210,0)}100%{box-shadow:0 0 0 0 rgba(25,118,210,0)}}
 
 /* Live */
 .live-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -142,14 +152,14 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .bubble .row{display:flex;gap:8px;margin-top:8px}
 .bubble .row button{border:1px solid var(--line);background:var(--surface2);border-radius:9px;padding:6px 10px;font-size:13px;font-weight:600}
 .live-controls{position:sticky;bottom:calc(76px + var(--sab));margin-top:14px;display:grid;gap:10px;background:var(--bg);padding-top:8px}
-.mics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mics{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .mic{min-height:90px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-weight:800;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 .mic svg{width:26px;height:26px}
 .mic small{font-weight:600;color:var(--muted);font-size:14px}
 .mic.patient{border-color:color-mix(in srgb,var(--ok) 50%,var(--line))}
 .mic.me{border-color:color-mix(in srgb,var(--blue) 50%,var(--line))}
 .type-row{display:flex;gap:8px}
-.type-row input{flex:1;height:54px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-size:18px}
+.type-row input{flex:1;min-width:0;height:54px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-size:18px}
 .empty{color:var(--muted);text-align:center;padding:24px 10px;font-size:14.5px}
 
 /* Log */
@@ -192,7 +202,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 
 <header class="top">
   <div class="brand">
-    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#e0323f"/><path d="M14 18a6 6 0 0 1 6-6h24a6 6 0 0 1 6 6v18a6 6 0 0 1-6 6H30l-9 8v-8h-1a6 6 0 0 1-6-6z" fill="#fff"/><path d="M29 19h6v6h6v6h-6v6h-6v-6h-6v-6h6z" fill="#e0323f"/></svg>
+    <svg viewBox="0 0 505.66 546.59" aria-hidden="true"><path d="M.29,63.82c-.07,0-.27.08-.27.4v75.94c0,.32.2.4.33.39-.68.58-.04,1.34-.04,1.88-.09,0-.28.11-.28.37v32.03s0,6.29,0,6.29v55.59c0,.29.2.39.29.38l-.02,1.25c-.08-.01-.27.1-.27.36v30.46s-.01,4.43-.01,4.43c0,.33.12.57.28.61v.93c-.17.05-.28.29-.28.62v7.88s.01,14.46.01,14.46v14.15s0,40.88,0,40.88v2.2s0,5.35,0,5.35v.63S0,364.79,0,364.79c0,.33.13.55.29.62.46,13.89,6.97,28.53,16.44,38.93,1.5,1.65,2.73,3.21,4.57,4.55,10.99,10.06,24.85,16,39.83,17.11l77.95.21c3.47,0,5.84,3.43,6.29,6.09l-.09,8.56c0,.34.12.57.29.63v3.75c-.16.08-.29.29-.29.61v4.14c0,.33.12.57.29.62v2.81c-.17.05-.28.28-.28.63v14.49c0,.34.13.55.29.63l-.15,11.88-.17,16.41c0,.34.18.57.33.64v14.75c-.17.08-.3.29-.3.63v12.61c0,.34.13.55.32.63l-.03.63-.03,18.35c0,.21.04.44-.02.53-.13.21.08.51.42.27l23.47-16.76,25.53-18.18,21.35-15.14,18.58-13.22,78.73-56.03,2.58-1.08,127.33-.06c9.82-.76,19.11-3.01,27.62-7.74,5.18-2.87,9.88-6.05,14.08-10.17l2.54-2.5c4.15-4.58,7.95-9.31,10.51-14.95l3.25-7.17c1.8-4.7,2.8-9.61,3.57-14.64l.27-4.74c.11-.01.29-.06.31-.43V63.94c-.02-.37-.2-.42-.32-.43l-.08-4.03c-.84-5.5-1.55-11.01-3.64-16.15l-2.55-6.28c-2.57-5.04-5.44-9.79-9.16-14.11l-7.2-7.21c-3.97-3.51-8.36-6.28-13.08-8.62-3.88-1.93-7.59-3.92-11.83-4.8l-9.06-1.88L444.24,0H61.46s-3.94.37-3.94.37c-1.62.15-3.32.66-4.95.94-10.67,1.81-21.49,7.53-29.74,14.6-2.37,2.03-4.53,3.88-6.59,6.31C6.35,33.88.27,48.75.29,63.82Z" fill="#fff"/><path d="M210.29,82.56c1.25-.25,2.56-.22,3.83-.11.44-.01.73,0,1.16,0,1.73-.09,3.43-.05,5.08.12,2.6-.24,5.56-.24,8.18,0,4.74-.16,9.58-.19,14.51-.09l1.16-.05c2.05-.07,4.06-.03,6.03.13,2.14-.23,4.73-.24,6.92.01,8.85-.16,17.77-.19,26.78-.08l1.45-.07c3.61-.1,7.2-.04,10.76.19,3.6.06,6.03,3.53,6.02,7.18l-.04,14.8c.26,4.52.26,9.31,0,13.83v5.97c.26,1.23.26,2.54,0,3.77v1.26s.15.38.15.38l-.11,43.27,24.52-.07,6.83.02,7.33-.02,1.16.05c7.4-.11,14.75-.08,22.06.09,1.62-.1,3.3-.2,5.04-.29l2.18-.04c5.11.23,10.26.32,15.43.26,2.56.04,5.91,2.74,5.91,5.77l-.02,86.37c0,2.88-3.41,5.95-6.28,5.95l-84.21.09v21.68c.29,1.59.27,3.49,0,5.04.28,1.61.28,3.65,0,5.35v15.72c.28,3.92.27,8.03,0,11.94l-.15,24.79c-.02,2.74-2.99,5.89-6.04,5.89l-85.42.11c-3.23-.69-6.41-2.74-6.42-6.34l-.12-84.15-84.16-.11c-3.58,0-6.11-3.55-6.51-6.47-.08-4.25-.03-8.46.15-12.63-.26-6.7-.27-14,0-20.75-.26-2.65-.25-5.78,0-8.49-.1-6.14-.2-12.32-.3-18.55v-8.79c.12-1.7.21-3.38.3-5.04-.28-3.43-.25-7.22-.03-10.73-.01-3.33,2.86-6.66,6.34-6.69,6.62.08,13.22.02,19.8-.18h3.13c8.26.22,16.56.29,24.89.21l3.1-.2c4.91.21,9.85.27,14.82.18h2.14c3.17-.1,6.34-.09,9.52,0,.82,0,1.55-.07,2.39-.03,1.53.1,3.02.05,4.47-.14v-84.78c.93-3.18,3.26-5.34,6.29-5.51Z" fill="#1976d2"/></svg>
     <div><h1>Scene Translator</h1><p id="subtitle">EMS patient phrasebook</p></div>
   </div>
   <button id="themeBtn" class="icon-btn" aria-label="Switch light or dark mode">
@@ -203,6 +213,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 <main>
   <!-- PHRASES -->
   <section id="view-phrases" class="view active">
+    <button class="micbar hidden" data-micbar><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Microphone not allowed yet. <b>Tap to allow</b></span></button>
     <div class="pickers">
       <label class="picker"><span>Patient language</span><select id="langSel"></select></label>
       <label class="picker"><span>Situation</span><select id="catSel"></select></label>
@@ -218,6 +229,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
   <!-- LIVE -->
   <section id="view-live" class="view">
     <div class="live-head"><h2>Live conversation</h2><span class="small" id="liveLangLbl"></span></div>
+    <button class="micbar hidden" data-micbar><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Microphone not allowed yet. <b>Tap to allow</b></span></button>
     <div id="convo" class="convo"><div class="empty">Tap <b>Patient speaks</b> and hold the phone toward the patient. Their words appear here in English.<br><br>Tap <b>I speak</b> to say something in English and play it back in their language.</div></div>
     <div class="live-controls">
       <div class="mics">
@@ -335,7 +347,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 <script src="phrases.js?v=4"></script>
 <script>
 "use strict";
-const APP_VERSION = '1.8';
+const APP_VERSION = '2.0';
 /* ---------- Languages ---------- */
 const EN = { c:'en', name:'English', sr:'en-US', tts:['en-US','en'], mm:'en', lt:['en'] };
 const LANGS = [
@@ -480,7 +492,11 @@ const IS_STANDALONE = matchMedia('(display-mode: standalone)').matches || naviga
 let micState = 'unknown';
 function setMicState(st){ micState = st; const el = document.getElementById('micState'); if (el) el.textContent =
   { granted:'Allowed', denied:'Blocked', prompt:'Not allowed yet', unknown:'Not checked yet' }[st] || st;
-  const d = document.getElementById('micDot'); if (d) d.className = 'status-dot' + (st === 'granted' ? ' ok' : st === 'denied' ? ' bad' : ''); }
+  const d = document.getElementById('micDot'); if (d) d.className = 'status-dot' + (st === 'granted' ? ' ok' : st === 'denied' ? ' bad' : '');
+  document.querySelectorAll('[data-micbar]').forEach(b => {
+    b.classList.toggle('hidden', st === 'granted' || st === 'unknown');
+    b.querySelector('span').innerHTML = st === 'denied' ? 'Microphone is blocked. <b>Tap to fix</b>' : 'Microphone not allowed yet. <b>Tap to allow</b>';
+  }); }
 async function watchMic(){
   try { const ps = await navigator.permissions.query({ name:'microphone' }); setMicState(ps.state); ps.onchange = () => setMicState(ps.state); }
   catch { setMicState('unknown'); }
@@ -890,7 +906,7 @@ function bindSettings(){
     <span class="status-dot ${tts ? 'ok' : 'bad'}"></span>Speaking aloud ${tts ? 'supported' : 'not supported'}`;
 }
 function applyTheme(){ document.documentElement.dataset.theme = S.theme;
-  document.querySelector('meta[name=theme-color]').content = S.theme === 'dark' ? '#0b1220' : '#f3f5f9'; }
+  document.querySelector('meta[name=theme-color]').content = '#0d3270'; }
 
 /* ---------- Wire up ---------- */
 function showView(v){
@@ -915,6 +931,9 @@ function init(){
     if (navigator.vibrate) try { navigator.vibrate([40, 60, 40]); } catch {}
   };
   $('#micClose').onclick = () => $('#micHelp').classList.add('hidden');
+  document.querySelectorAll('[data-micbar]').forEach(b => b.onclick = async () => {
+    if (await requestMic()) toast('Microphone allowed. You\'re ready to listen.', 4000);
+  });
   $('#micCheck').onclick = async () => {
     const b = $('#micCheck'), html = b.innerHTML; b.disabled = true; b.textContent = 'Asking your phone…';
     const ok = await requestMic(); b.disabled = false; b.innerHTML = html;
