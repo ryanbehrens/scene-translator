@@ -73,8 +73,8 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .phrase .en{font-weight:650;font-size:19px;line-height:1.3}
 .phrase .tr{color:var(--muted);font-size:17px;margin-top:4px}
 .group-h{font-size:14px!important}
-.pill{display:inline-block;margin-top:8px;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
-.pill.yn{color:var(--blue)}.pill.scale{color:var(--warn)}.pill.open,.pill.point{color:var(--ok)}
+.pill{display:block;width:fit-content;margin-top:8px;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.pill.yn{color:var(--blue)}.pill.color{color:#c084fc}.pill.scale{color:var(--warn)}.pill.open,.pill.point{color:var(--ok)}
 
 /* Bottom tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);
@@ -111,6 +111,11 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .yn button small{font-size:13px;font-weight:600;opacity:.85}
 .yn .y{background:var(--ok)}.yn .n{background:var(--bad)}
 .yn .u{grid-column:1 / -1;min-height:62px;font-size:20px;background:var(--surface2);color:var(--text);border:1px solid var(--line)}
+.colors{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.colors button{display:flex;align-items:center;gap:10px;min-height:62px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);text-align:left}
+.colors .sw{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
+.colors .cl{display:flex;flex-direction:column;font-weight:700;font-size:17px}
+.colors .cl small{font-weight:600;font-size:12.5px;color:var(--muted)}
 .scale{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
 .scale button{min-height:64px;border-radius:12px;border:0;font-weight:800;font-size:24px;color:#fff}
 .scale-legend{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
@@ -177,6 +182,8 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .modal-box h2{margin:0 0 8px;font-size:20px}
 .modal-box p{color:var(--muted);margin:8px 0}
 .modal-box{max-height:88vh;overflow:auto}
+@keyframes flash{0%,100%{background:transparent}30%{background:color-mix(in srgb,var(--warn) 25%,transparent)}}
+#micSteps.flash{animation:flash 1.2s 2;border-radius:10px}
 #micSteps ol{padding-left:20px;margin:6px 0 10px}#micSteps li{margin:5px 0}#micSteps h4{margin:12px 0 2px;color:var(--text);font-size:15px}
 [dir=rtl]{text-align:right}
 </style>
@@ -233,6 +240,13 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
   <section id="view-settings" class="view">
     <h2 class="sec-h">Settings</h2>
     <div class="card">
+      <h3>Microphone</h3>
+      <p class="small">Status: <span class="status-dot" id="micDot"></span><b id="micState">checking…</b></p>
+      <button id="micCheck" class="btn primary block" style="min-height:58px;font-size:18px;margin-top:6px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Allow microphone access</button>
+      <p class="small" style="margin-top:8px">Tap to show your phone's microphone permission pop-up. Do this before a call so listening works right away.</p>
+    </div>
+    <div class="card">
       <h3>Translation service</h3>
       <p class="small">Used for the patient's spoken answers, the Live tab, and languages without a built-in phrase set. Built-in phrases work offline and never use this.</p>
       <div class="field"><label for="provSel">Service</label>
@@ -254,7 +268,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
       <div class="switch"><span>Read patient answers aloud in English<br><span class="small">Hands-free: hear the answer while you work</span></span><input id="readAnswers" type="checkbox"></div>
       <div class="field"><label for="rate">Speaking speed: <b id="rateVal"></b></label><input id="rate" type="range" min="0.6" max="1.2" step="0.05" style="width:100%"></div>
       <p class="small" id="speechSupport"></p>
-      <div class="switch"><span>Microphone: <b id="micState">checking…</b></span><button id="micCheck" class="btn" style="min-height:44px">Allow / fix</button></div>
+
     </div>
     <div class="card">
       <h3>About</h3>
@@ -318,10 +332,10 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 </div>
 <div id="toast" role="status"></div>
 
-<script src="phrases.js?v=3"></script>
+<script src="phrases.js?v=4"></script>
 <script>
 "use strict";
-const APP_VERSION = '1.4';
+const APP_VERSION = '1.7';
 /* ---------- Languages ---------- */
 const EN = { c:'en', name:'English', sr:'en-US', tts:['en-US','en'], mm:'en', lt:['en'] };
 const LANGS = [
@@ -362,7 +376,8 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 function toast(msg, ms = 3200){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms); }
 const L = () => langBy(S.lang);
 const ICON_LIST = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/></svg>';
-const TYPE_LBL = { yn:'Yes / No', scale:'0–10', open:'Spoken', point:'Point', instr:'Instruction' };
+const AO_LBL = { '1':'Pe', '2':'Pl', '3':'Ti', '4':'Ev' };
+const TYPE_LBL = { yn:'Yes / No', scale:'0–10', open:'Spoken', point:'Point', instr:'Instruction', color:'Tap color' };
 
 /* ---------- Translation services ---------- */
 const chromeTranslators = {};
@@ -464,7 +479,8 @@ const IS_ANDROID = /Android/i.test(navigator.userAgent);
 const IS_STANDALONE = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 let micState = 'unknown';
 function setMicState(st){ micState = st; const el = document.getElementById('micState'); if (el) el.textContent =
-  { granted:'allowed', denied:'blocked', prompt:'will ask', unknown:'unknown' }[st] || st; }
+  { granted:'Allowed', denied:'Blocked', prompt:'Not allowed yet', unknown:'Not checked yet' }[st] || st;
+  const d = document.getElementById('micDot'); if (d) d.className = 'status-dot' + (st === 'granted' ? ' ok' : st === 'denied' ? ' bad' : ''); }
 async function watchMic(){
   try { const ps = await navigator.permissions.query({ name:'microphone' }); setMicState(ps.state); ps.onchange = () => setMicState(ps.state); }
   catch { setMicState('unknown'); }
@@ -488,9 +504,11 @@ function micStepsHTML(){
 function showMicHelp(msg){
   $('#micHelpMsg').textContent = msg || 'The microphone is blocked for this app. Tap "Allow microphone". If no pop-up appears, follow the steps below once.';
   $('#micSteps').innerHTML = micStepsHTML();
+  $('#micAllow').textContent = 'Allow microphone'; $('#micAllow').disabled = false;
   $('#micHelp').classList.remove('hidden');
 }
 // Ask the phone for mic access. Shows the system pop-up whenever the phone still allows asking.
+let lastMicErr = '';
 async function requestMic(){
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     showMicHelp('This browser can\'t use the microphone here. Make sure the app is opened from its https:// address in Safari (iPhone) or Chrome (Android).'); return false; }
@@ -499,6 +517,7 @@ async function requestMic(){
     st.getTracks().forEach(t => t.stop());
     setMicState('granted'); return true;
   } catch (e) {
+    lastMicErr = e.name || 'Error';
     if (e.name === 'NotFoundError') { showMicHelp('No microphone was found on this device.'); return false; }
     setMicState('denied');
     showMicHelp('The phone didn\'t allow the microphone. It won\'t show the pop-up again until you allow it in settings. Follow these steps once:');
@@ -634,10 +653,16 @@ function renderList(){
   if (!items.length) html = '<div class="empty">No phrases match. Try the Live tab to translate anything.</div>';
   items.forEach(({ p, cat }, i) => {
     const names = LETTER_NAMES[cat.id];
-    if (!searching && names && p.tag && p.tag !== lastTag) { html += `<div class="group-h">${p.tag} — ${names[p.tag]}</div>`; lastTag = p.tag; }
+    const isAO = /^[1-4]$/.test(p.tag || '');
+    if (!searching) {
+      if (isAO && !/^[1-4]$/.test(lastTag || '')) html += `<div class="group-h">A&amp;O ×4 — Person · Place · Time · Event</div>`;
+      else if (!isAO && /^[1-4]$/.test(lastTag || '')) html += `<div class="group-h">${cat.id === 'ao' ? '' : 'Assessment'}</div>`;
+      else if (names && p.tag && p.tag !== lastTag) html += `<div class="group-h">${p.tag} — ${names[p.tag]}</div>`;
+    }
+    lastTag = p.tag;
     const tr = trOf(p, lang.c);
     html += `<button class="phrase" data-i="${i}">
-      ${p.tag ? `<span class="tag">${esc(p.tag)}</span>` : ''}
+      ${p.tag ? `<span class="tag">${esc(AO_LBL[p.tag] || p.tag)}</span>` : ''}
       <span class="txt"><div class="en">${esc(p.en)}</div>
       <div class="tr" ${lang.rtl ? 'dir="rtl"' : ''} lang="${lang.c}" data-en="${esc(p.en)}">${tr ? esc(tr) : 'Translating…'}</div>
       <span class="pill ${p.type}">${TYPE_LBL[p.type]}</span></span></button>`;
@@ -675,7 +700,7 @@ function speakCurrent(slow){
 function renderSheet(){
   const { p, cat } = curP(); const lang = L();
   const tr = trOf(p, lang.c);
-  $('#sMeta').textContent = cat.name.split(' – ')[0] + (p.tag ? ' · ' + p.tag : '') + '   ' + (view.idx + 1) + ' / ' + view.list.length;
+  $('#sMeta').textContent = cat.name.split(' – ')[0] + (p.tag ? ' · ' + ({ '1':'A&O Person','2':'A&O Place','3':'A&O Time','4':'A&O Event' }[p.tag] || p.tag) : '') + '   ' + (view.idx + 1) + ' / ' + view.list.length;
   $('#sEn').textContent = p.en;
   const sTr = $('#sTr');
   sTr.textContent = tr || 'Translating…'; sTr.lang = lang.c; sTr.dir = lang.rtl ? 'rtl' : 'ltr';
@@ -694,6 +719,12 @@ function renderSheet(){
     const col = n => `hsl(${120 - n * 12},70%,${n > 5 ? 44 : 38}%)`;
     a.innerHTML = `<h3>Patient taps a number</h3><div class="scale">${Array.from({ length:11 }, (_, n) => `<button data-ans="${n}" style="background:${col(n)}">${n}</button>`).join('')}</div>
       <div class="scale-legend"><span>0 = ${esc(uiOf('nopain', lc) || 'No pain')}</span><span>10 = ${esc(uiOf('worst', lc) || 'Worst pain')}</span></div>`;
+  } else if (p.type === 'color') {
+    const sw = [['c_none','transparent'],['c_clear','#dbeafe'],['c_white','#f8fafc'],['c_yellow','#facc15'],['c_green','#65a30d'],['c_brown','#92400e'],['c_blood','#b91c1c'],['c_pink','#f9a8d4']];
+    a.innerHTML = `<h3>Patient taps the color</h3><div class="colors">${sw.map(([k, c]) =>
+      `<button data-ans="${k}"><span class="sw" style="background:${c}${k === 'c_none' ? ';border:2px dashed var(--muted)' : ''}"></span>
+       <span class="cl"><span dir="${dir}">${esc(uiOf(k, lc) || UI_TR[k].en)}</span>${uiOf(k, lc) && uiOf(k, lc) !== UI_TR[k].en ? `<small>${UI_TR[k].en}</small>` : ''}</span></button>`).join('')}</div>
+      <button class="btn block" style="margin-top:10px" data-listen>🎤 Or listen to a spoken answer</button><div class="lb"></div>`;
   } else if (p.type === 'open' || p.type === 'point') {
     a.innerHTML = `<h3>${p.type === 'point' ? 'Patient points — or answers out loud' : 'Patient answers out loud'}</h3>
       <button class="btn primary block" style="min-height:64px;font-size:18px" data-listen>🎤 Listen to patient (${esc(lang.name.split(' ')[0])})</button><div class="lb"></div>
@@ -830,9 +861,25 @@ function showView(v){
 }
 function init(){
   watchMic();
-  $('#micAllow').onclick = async () => { if (await requestMic()) { $('#micHelp').classList.add('hidden'); toast('Microphone allowed. Tap Listen again.', 4000); } };
+  $('#micAllow').onclick = async () => {
+    const btn = $('#micAllow'); btn.disabled = true; btn.textContent = 'Asking your phone…';
+    const ok = await requestMic();
+    btn.disabled = false;
+    if (ok) { btn.textContent = 'Allow microphone'; $('#micHelp').classList.add('hidden'); toast('Microphone allowed. Tap Listen again.', 4000); return; }
+    // Phone refused without a pop-up: say so clearly and point to the steps
+    btn.textContent = 'Still blocked — tap to try again';
+    $('#micHelpMsg').innerHTML = '<b style="color:var(--bad)">Your phone blocked the microphone without asking.</b> That means it has to be turned on in your phone\'s settings. Follow the steps below, then come back and tap the button again.' +
+      (lastMicErr ? ' <span style="opacity:.7">(' + esc(lastMicErr) + ')</span>' : '');
+    const st = $('#micSteps'); st.classList.remove('flash'); void st.offsetWidth; st.classList.add('flash');
+    $('#micHelp .modal-box').scrollTo({ top:0, behavior:'smooth' });
+    if (navigator.vibrate) try { navigator.vibrate([40, 60, 40]); } catch {}
+  };
   $('#micClose').onclick = () => $('#micHelp').classList.add('hidden');
-  $('#micCheck').onclick = async () => { if (await requestMic()) toast('Microphone is allowed.'); };
+  $('#micCheck').onclick = async () => {
+    const b = $('#micCheck'), html = b.innerHTML; b.disabled = true; b.textContent = 'Asking your phone…';
+    const ok = await requestMic(); b.disabled = false; b.innerHTML = html;
+    if (ok) toast('Microphone allowed. You\'re ready to listen.', 4000);
+  };
   $('#appVer').textContent = APP_VERSION;
   applyTheme(); renderPickers(); updateLangLabels(); renderList(); bindSettings(); renderLog();
   $('#langSel').addEventListener('change', e => { S.lang = e.target.value; saveS(); updateLangLabels(); renderList(); });
@@ -846,7 +893,8 @@ function init(){
   $('#sNext').onclick = () => { stopListening(); if (view.idx < view.list.length - 1) { view.idx++; renderSheet(); if (S.autoSpeak) speakCurrent(); } else closeSheet(); };
   $('#sAnswer').addEventListener('click', e => {
     const ans = e.target.closest('[data-ans]');
-    if (ans) { const v = ans.dataset.ans; recordAnswer(/^\d+$/.test(v) ? 'Pain ' + v + ' / 10' : UI_TR[v].en.toUpperCase()); return; }
+    if (ans) { const v = ans.dataset.ans;
+      recordAnswer(/^\d+$/.test(v) ? 'Pain ' + v + ' / 10' : v.startsWith('c_') ? 'Mucus: ' + UI_TR[v].en : UI_TR[v].en.toUpperCase()); return; }
     const li = e.target.closest('[data-listen]'); if (li) { sheetListen(li); return; }
     if (e.target.id === 'pointSave') { const v = $('#pointNote').value.trim(); if (v) recordAnswer('Points to: ' + v); }
   });

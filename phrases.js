@@ -164,3 +164,239 @@ const CATEGORIES = [
     P('', 'instr', 'Push now!', '¡Puje ahora!', '现在用力！', 'Rặn đi!', 'Umire na po!', 'ادفعي الآن!', 'Тужьтесь!'),
   ]},
 ];
+
+/* ---------- Japanese (日本語) — polite form. Keyed by the English phrase. ---------- */
+Object.assign(UI_TR.yes, { ja: 'はい' });
+Object.assign(UI_TR.no, { ja: 'いいえ' });
+Object.assign(UI_TR.unsure, { ja: 'わかりません' });
+Object.assign(UI_TR.nopain, { ja: '痛みなし' });
+Object.assign(UI_TR.worst, { ja: '最悪の痛み' });
+Object.assign(UI_TR.speak, { ja: '今、話してください' });
+
+const JA = {
+  // Basics
+  'Hello. We are paramedics. We are here to help you.': 'こんにちは。私たちは救急隊です。あなたを助けに来ました。',
+  'I am using this phone to translate.': 'このスマートフォンで翻訳しています。',
+  'Please answer by tapping the screen, or nod yes or no.': '画面をタップして答えてください。または、うなずくか、首を横に振ってください。',
+  'Do you understand me?': '私の言っていることがわかりますか？',
+  'What is your name?': 'お名前は何ですか？',
+  'How old are you?': '何歳ですか？',
+  'Is there someone here who speaks English?': 'ここに英語を話せる人はいますか？',
+  'May we examine and treat you?': '診察と処置をしてもよろしいですか？',
+  'Where does it hurt? Point to it.': 'どこが痛いですか？指でさしてください。',
+  'Is anyone else hurt?': '他にけがをした人はいますか？',
+  'Stay still. Do not move.': 'じっとしていてください。動かないでください。',
+  'We are going to check your blood pressure.': '血圧を測ります。',
+  'Do you want to go to the hospital?': '病院に行きたいですか？',
+  'We are taking you to the hospital.': 'これから病院へ搬送します。',
+  // OPQRST
+  'When did it start?': 'いつから始まりましたか？',
+  'What were you doing when it started?': '始まったとき、何をしていましたか？',
+  'Did it start suddenly?': '急に始まりましたか？',
+  'Does anything make it better?': '何かをすると楽になりますか？',
+  'Does anything make it worse?': '何かをすると悪くなりますか？',
+  'Does it hurt more when you breathe or move?': '息をしたり動いたりすると、もっと痛みますか？',
+  'Does it hurt when I press here?': 'ここを押すと痛いですか？',
+  'Is the pain sharp or stabbing?': '鋭い痛み、または刺すような痛みですか？',
+  'Does it feel like pressure or squeezing?': '押される感じ、または締めつけられる感じですか？',
+  'Is it a burning pain?': '焼けるような痛みですか？',
+  'Is it a dull ache?': '鈍い痛みですか？',
+  'Does it feel like tearing or ripping?': '裂けるような痛みですか？',
+  'Does the pain move anywhere else? Point to where.': '痛みは他の場所に広がりますか？その場所を指でさしてください。',
+  'From 0 to 10, how bad is the pain? 0 is no pain, 10 is the worst pain.': '0から10で、痛みはどのくらいですか？0は痛みなし、10は最悪の痛みです。',
+  'Is the pain constant?': '痛みはずっと続いていますか？',
+  'Does the pain come and go?': '痛みは出たり消えたりしますか？',
+  'Have you had this pain before?': '以前にもこの痛みがありましたか？',
+  // SAMPLE
+  'What is bothering you the most right now?': '今、一番つらいことは何ですか？',
+  'Are you allergic to any medicines?': '薬のアレルギーはありますか？',
+  'Are you allergic to anything else, like food, latex, or bee stings?': '食べ物、ラテックス、ハチ刺されなど、他にアレルギーはありますか？',
+  'Do you take any medicines?': '何か薬を飲んでいますか？',
+  'Please show me your medicines.': '飲んでいる薬を見せてください。',
+  'Do you take blood thinners?': '血液をサラサラにする薬（抗凝固薬）を飲んでいますか？',
+  'Did you take your medicines today?': '今日、薬を飲みましたか？',
+  'Do you have any medical problems?': '何か持病はありますか？',
+  'Do you have heart problems?': '心臓の病気はありますか？',
+  'Do you have diabetes?': '糖尿病はありますか？',
+  'Do you have high blood pressure?': '高血圧はありますか？',
+  'Do you have asthma or lung problems?': 'ぜんそくや肺の病気はありますか？',
+  'Have you had surgery recently?': '最近、手術を受けましたか？',
+  'When did you last eat or drink?': '最後に食べたり飲んだりしたのはいつですか？',
+  'What happened?': '何がありましたか？',
+  'What happened right before this started?': 'これが始まる直前に何がありましたか？',
+  // Stroke
+  'Please smile and show me your teeth.': '歯を見せて笑ってください。',
+  'Close your eyes and hold both arms out for 10 seconds.': '目を閉じて、両腕を前に伸ばしたまま10秒間保ってください。',
+  "Repeat after me: 'The sky is blue.'": '私のあとに続けて言ってください：「空は青い。」',
+  'Squeeze my hands.': '私の手を強く握ってください。',
+  'What time did you last feel normal?': '最後に普段どおりだったのは何時ですか？',
+  'Do you feel weak or numb on one side of your body?': '体の片側に力が入らない、またはしびれがありますか？',
+  'Is it hard to speak or find words?': '話しにくい、または言葉が出てこないですか？',
+  'Is your vision blurry or are you seeing double?': '目がかすんだり、物が二重に見えたりしますか？',
+  'Is this the worst headache of your life?': '今までで一番ひどい頭痛ですか？',
+  'What day is it today?': '今日は何曜日ですか？',
+  // Cardiac
+  'Do you have chest pain or pressure?': '胸の痛みや圧迫感はありますか？',
+  'Does the pain go to your arm, jaw, neck, or back?': '痛みは腕、あご、首、背中に広がりますか？',
+  'Are you short of breath?': '息苦しいですか？',
+  'Do you feel sick to your stomach?': '吐き気がしますか？',
+  'Are you sweating more than usual?': 'いつもより汗をかいていますか？',
+  'Did you feel dizzy or pass out?': 'めまいがしたり、気を失ったりしましたか？',
+  'Do you have a pacemaker or defibrillator?': 'ペースメーカーや除細動器を入れていますか？',
+  'Have you taken nitroglycerin today?': '今日、ニトログリセリンを使いましたか？',
+  'In the last 2 days, have you taken medicine for erections, like Viagra or Cialis?': 'この2日以内に、バイアグラやシアリスなどの勃起不全の薬を飲みましたか？',
+  'Are you allergic to aspirin?': 'アスピリンのアレルギーはありますか？',
+  'Chew this aspirin, then swallow it.': 'このアスピリンをかんでから、飲み込んでください。',
+  'Put this under your tongue. Do not swallow it.': 'これを舌の下に入れてください。飲み込まないでください。',
+  // Breathing
+  'Are you having trouble breathing?': '呼吸が苦しいですか？',
+  'Do you use an inhaler? Where is it?': '吸入器を使っていますか？どこにありますか？',
+  'Do you use oxygen at home?': '家で酸素を使っていますか？',
+  'Do you have a cough?': 'せきは出ますか？',
+  'Is your throat or tongue swelling?': 'のどや舌が腫れていますか？',
+  'This mask will give you oxygen. Breathe normally.': 'このマスクから酸素が出ます。普通に呼吸してください。',
+  'Breathe slowly with me.': '私と一緒にゆっくり呼吸してください。',
+  'Take a deep breath in.': '大きく息を吸ってください。',
+  // Trauma
+  'Did you fall?': '転んだり、落ちたりしましたか？',
+  'Did you hit your head?': '頭を打ちましたか？',
+  'Did you pass out?': '気を失いましたか？',
+  'Does your neck or back hurt?': '首や背中は痛いですか？',
+  'Do not move your head.': '頭を動かさないでください。',
+  'Wiggle your fingers and toes.': '手と足の指を動かしてください。',
+  'Can you feel me touching you?': '私が触っているのがわかりますか？',
+  'Were you wearing a seatbelt?': 'シートベルトをしていましたか？',
+  'Where are you bleeding? Point to it.': 'どこから出血していますか？指でさしてください。',
+  'We need to cut your clothes to check for injuries.': 'けがを確認するため、服を切らせてください。',
+  'Can you walk?': '歩けますか？',
+  // Illness
+  'Do you have a fever?': '熱はありますか？',
+  'Do you feel dizzy or weak?': 'めまいや力が入らない感じはありますか？',
+  'Are you vomiting?': '吐いていますか？',
+  'Is there blood in your vomit or stool?': '吐いたものや便に血が混じっていますか？',
+  'Do you have diarrhea?': '下痢をしていますか？',
+  'How many days have you been sick?': '何日前から具合が悪いですか？',
+  'Do you use insulin?': 'インスリンを使っていますか？',
+  'We need to check your blood sugar with a small finger prick.': '指先を少し刺して、血糖値を測ります。',
+  'Did you just have a seizure?': '今、けいれんの発作がありましたか？',
+  'Do you have epilepsy?': 'てんかんはありますか？',
+  'Have you had any alcohol or drugs today?': '今日、お酒や薬物を使いましたか？',
+  'Did you take too much of any medicine?': '薬を飲みすぎましたか？',
+  'Are you thinking about hurting yourself?': '自分を傷つけようと考えていますか？',
+  // OB / Pregnancy
+  'Are you pregnant?': '妊娠していますか？',
+  'How many months pregnant are you?': '妊娠何か月ですか？',
+  'Is this your first baby?': '初めての出産ですか？',
+  'Are you having contractions?': '陣痛はありますか？',
+  'How many minutes apart are the contractions?': '陣痛は何分おきですか？',
+  'Has your water broken?': '破水しましたか？',
+  'Are you bleeding?': '出血していますか？',
+  'Do you feel the urge to push?': 'いきみたい感じがしますか？',
+  'Can you feel the baby moving?': '赤ちゃんが動いているのを感じますか？',
+  'Have you had any problems with this pregnancy?': '今回の妊娠で何か問題はありましたか？',
+  'When was your last period?': '最後の生理はいつでしたか？',
+  'Do not push. Breathe.': 'いきまないでください。呼吸をしてください。',
+  'Push now!': '今、いきんでください！',
+};
+CATEGORIES.forEach(c => c.phrases.forEach(p => { if (JA[p.en]) p.ja = JA[p.en]; }));
+
+/* ======================================================================
+ * v1.7 — Field feedback additions (A&O x4, stroke, cardiac, respiratory)
+ * PJ() = phrase with Japanese included: English, es, zh, vi, tl, ar, ru, ja
+ * REF() = reuse an existing phrase (same translations) in another section
+ * ====================================================================== */
+function PJ(tag, type, en, es, zh, vi, tl, ar, ru, ja) { return { tag, type, en, es, zh, vi, tl, ar, ru, ja }; }
+function REF(en, tag = '') {
+  for (const c of CATEGORIES) for (const p of c.phrases) if (p.en === en) return { ...p, tag };
+  throw new Error('Phrase not found: ' + en);
+}
+function catById(id) { return CATEGORIES.find(c => c.id === id); }
+function insertAfter(list, afterEn, ...items) { const i = list.findIndex(p => p.en === afterEn); list.splice(i < 0 ? list.length : i + 1, 0, ...items); }
+function replacePhrase(list, en, ...items) { const i = list.findIndex(p => p.en === en); list.splice(i, 1, ...items); }
+
+// Mucus color buttons (patient taps a color)
+Object.assign(UI_TR, {
+  c_none:   { en: 'No mucus', es: 'No tengo flema', zh: '没有痰', vi: 'Không có đờm', tl: 'Walang plema', ar: 'لا يوجد بلغم', ru: 'Нет мокроты', ja: 'たんは出ない' },
+  c_clear:  { en: 'Clear', es: 'Transparente', zh: '透明', vi: 'Trong', tl: 'Malinaw', ar: 'شفاف', ru: 'Прозрачная', ja: '透明' },
+  c_white:  { en: 'White', es: 'Blanca', zh: '白色', vi: 'Trắng', tl: 'Puti', ar: 'أبيض', ru: 'Белая', ja: '白' },
+  c_yellow: { en: 'Yellow', es: 'Amarilla', zh: '黄色', vi: 'Vàng', tl: 'Dilaw', ar: 'أصفر', ru: 'Жёлтая', ja: '黄色' },
+  c_green:  { en: 'Green', es: 'Verde', zh: '绿色', vi: 'Xanh lá', tl: 'Berde', ar: 'أخضر', ru: 'Зелёная', ja: '緑' },
+  c_brown:  { en: 'Brown', es: 'Café', zh: '棕色', vi: 'Nâu', tl: 'Kayumanggi', ar: 'بني', ru: 'Коричневая', ja: '茶色' },
+  c_blood:  { en: 'Red / bloody', es: 'Roja / con sangre', zh: '红色/带血', vi: 'Đỏ / có máu', tl: 'Pula / may dugo', ar: 'أحمر / فيه دم', ru: 'Красная / с кровью', ja: '赤／血が混じる' },
+  c_pink:   { en: 'Pink & foamy', es: 'Rosada y espumosa', zh: '粉红色带泡沫', vi: 'Hồng và có bọt', tl: 'Rosas at mabula', ar: 'وردي ورغوي', ru: 'Розовая, пенистая', ja: 'ピンクで泡状' },
+});
+
+/* ---- A&O x4 (tags 1–4 = Person, Place, Time, Event) ---- */
+const AO = [
+  REF('What is your name?', '1'),
+  PJ('2', 'open', 'Where are you right now?', '¿Dónde está usted ahora?', '您现在在哪里？', 'Bây giờ bạn đang ở đâu?', 'Nasaan po kayo ngayon?', 'أين أنت الآن؟', 'Где вы сейчас находитесь?', '今、どこにいますか？'),
+  PJ('3', 'open', 'What year is it? What month?', '¿En qué año estamos? ¿En qué mes?', '现在是哪一年？几月？', 'Bây giờ là năm nào? Tháng mấy?', 'Anong taon po ngayon? Anong buwan?', 'في أي سنة نحن؟ وفي أي شهر؟', 'Какой сейчас год? Какой месяц?', '今年は何年ですか？何月ですか？'),
+  REF('What day is it today?', '3'),
+  PJ('4', 'open', 'Do you know what happened to you today?', '¿Sabe lo que le pasó hoy?', '您知道今天发生了什么事吗？', 'Bạn có biết hôm nay chuyện gì đã xảy ra với bạn không?', 'Alam po ba ninyo kung ano ang nangyari sa inyo ngayon?', 'هل تعرف ماذا حدث لك اليوم؟', 'Вы знаете, что с вами сегодня произошло?', '今日、何があったかわかりますか？'),
+];
+const aoCopy = () => AO.map(p => ({ ...p }));
+
+/* ---- Shared new phrases ---- */
+const LKW = PJ('', 'open', 'When was the last time you were completely normal? What time?', '¿Cuándo fue la última vez que se sintió completamente normal? ¿A qué hora?', '您最后一次完全正常是什么时候？几点？', 'Lần cuối bạn hoàn toàn bình thường là khi nào? Lúc mấy giờ?', 'Kailan po ang huling beses na lubos kayong normal? Anong oras?', 'متى كانت آخر مرة كنت فيها طبيعياً تماماً؟ في أي ساعة؟', 'Когда вы в последний раз были в полном порядке? Во сколько?', '最後に完全に普段どおりだったのはいつですか？何時ですか？');
+const LKW_WITNESS = PJ('', 'yn', 'Is there someone here who saw you when you were last normal?', '¿Hay alguien aquí que le haya visto cuando todavía estaba normal?', '这里有人在您还正常的时候见过您吗？', 'Ở đây có ai đã gặp bạn lúc bạn còn bình thường không?', 'May tao po ba rito na nakakita sa inyo noong normal pa kayo?', 'هل هنا شخص رآك عندما كنت طبيعياً آخر مرة؟', 'Есть ли здесь кто-то, кто видел вас, когда вы ещё были в порядке?', '最後に普段どおりだったあなたを見た人は、ここにいますか？');
+const LKW_BYSTANDER = PJ('', 'open', 'For family or bystanders: When did you last see this person acting normal?', 'Para familiares o testigos: ¿Cuándo fue la última vez que vio a esta persona actuar normal?', '请家属或旁人回答：您最后一次看到这个人正常是什么时候？', 'Dành cho người nhà hoặc người chứng kiến: Lần cuối bạn thấy người này bình thường là khi nào?', 'Para sa pamilya o nakasaksi: Kailan po ninyo huling nakita na normal ang taong ito?', 'للعائلة أو الحاضرين: متى رأيت هذا الشخص يتصرف بشكل طبيعي آخر مرة؟', 'Для родственников или свидетелей: когда вы в последний раз видели этого человека в нормальном состоянии?', 'ご家族または周りの方へ：この方が普段どおりだったのを最後に見たのはいつですか？');
+const RECENT_TRAUMA = PJ('', 'yn', 'Have you had a fall or any injury recently?', '¿Se ha caído o se ha lastimado recientemente?', '您最近摔倒过或受过伤吗？', 'Gần đây bạn có bị ngã hoặc bị thương không?', 'Natumba o nasaktan po ba kayo kamakailan?', 'هل سقطت أو تعرضت لأي إصابة مؤخراً؟', 'Вы недавно падали или получали какие-либо травмы?', '最近、転んだりけがをしたりしましたか？');
+const CHF = PJ('', 'yn', 'Do you have congestive heart failure?', '¿Tiene insuficiencia cardíaca?', '您有心力衰竭吗？', 'Bạn có bị suy tim không?', 'May congestive heart failure (paghina ng puso) po ba kayo?', 'هل لديك قصور في القلب؟', 'У вас сердечная недостаточность?', '心不全はありますか？');
+const ACTING_DIFFERENT = PJ('', 'yn', 'For family or bystanders: Is this person acting differently than normal?', 'Para familiares o testigos: ¿Esta persona se está comportando diferente de lo normal?', '请家属或旁人回答：这个人的表现和平时不一样吗？', 'Dành cho người nhà hoặc người chứng kiến: Người này có cư xử khác bình thường không?', 'Para sa pamilya o nakasaksi: Iba po ba ang kilos ng taong ito kaysa karaniwan?', 'للعائلة أو الحاضرين: هل يتصرف هذا الشخص بشكل مختلف عن المعتاد؟', 'Для родственников или свидетелей: этот человек ведёт себя не так, как обычно?', 'ご家族または周りの方へ：この方はいつもと様子が違いますか？');
+const SEIZURE_LENGTH = PJ('', 'open', 'For bystanders: How long did the seizure last?', 'Para testigos: ¿Cuánto tiempo duró la convulsión?', '请旁人回答：抽搐持续了多长时间？', 'Dành cho người chứng kiến: Cơn co giật kéo dài bao lâu?', 'Para sa nakasaksi: Gaano po katagal ang seizure?', 'للحاضرين: كم استمرت نوبة التشنج؟', 'Для свидетелей: сколько длился приступ судорог?', '周りの方へ：けいれんはどのくらい続きましたか？');
+
+/* ---- New section: A&O x4 (right after Basics) ---- */
+CATEGORIES.splice(1, 0, { id: 'ao', name: 'A&O ×4 – Orientation', phrases: aoCopy() });
+
+/* ---- Stroke ---- */
+{
+  const s = catById('stroke').phrases;
+  s.unshift(...aoCopy());
+  replacePhrase(s, 'What time did you last feel normal?', LKW, LKW_WITNESS, LKW_BYSTANDER);
+  s.splice(s.findIndex(p => p.en === 'What day is it today?' && !p.tag), 1); // now covered by A&O
+  insertAfter(s, 'Is this the worst headache of your life?',
+    REF('Have you had surgery recently?'), { ...RECENT_TRAUMA }, REF('Do you have diabetes?'));
+  s.push(REF('We need to check your blood sugar with a small finger prick.'));
+}
+
+/* ---- New section: Altered mental status / Seizure ---- */
+CATEGORIES.splice(CATEGORIES.findIndex(c => c.id === 'stroke') + 1, 0, { id: 'altered', name: 'Altered / Seizure', phrases: [
+  ...aoCopy(),
+  { ...ACTING_DIFFERENT }, { ...LKW_BYSTANDER },
+  REF('Did you just have a seizure?'), REF('Do you have epilepsy?'), { ...SEIZURE_LENGTH },
+  REF('Did you hit your head?'), { ...RECENT_TRAUMA },
+  REF('Do you have diabetes?'), REF('Do you use insulin?'), REF('When did you last eat or drink?'),
+  REF('We need to check your blood sugar with a small finger prick.'),
+  REF('Have you had any alcohol or drugs today?'), REF('Did you take too much of any medicine?'),
+]});
+
+/* ---- Trauma: A&O first ---- */
+catById('trauma').phrases.unshift(...aoCopy());
+
+/* ---- Cardiac: nitro sequence + cardiac history ---- */
+{
+  const c = catById('cardiac').phrases;
+  replacePhrase(c, 'Have you taken nitroglycerin today?',
+    PJ('', 'yn', 'Has a doctor prescribed nitroglycerin for you?', '¿Su médico le ha recetado nitroglicerina?', '医生给您开过硝酸甘油吗？', 'Bác sĩ có kê đơn nitroglycerin cho bạn không?', 'Niresetahan po ba kayo ng doktor ng nitroglycerin?', 'هل وصف لك الطبيب النيتروغليسرين؟', 'Вам врач назначал нитроглицерин?', '医師からニトログリセリンを処方されていますか？'),
+    PJ('', 'yn', 'Have you taken any nitroglycerin for this pain?', '¿Ha tomado nitroglicerina para este dolor?', '这次疼痛您用过硝酸甘油吗？', 'Bạn đã dùng nitroglycerin cho cơn đau này chưa?', 'Uminom po ba kayo ng nitroglycerin para sa sakit na ito?', 'هل تناولت النيتروغليسرين لهذا الألم؟', 'Вы принимали нитроглицерин от этой боли?', 'この痛みのためにニトログリセリンを使いましたか？'),
+    PJ('', 'yn', 'Did the nitroglycerin relieve the pain?', '¿Se le quitó o mejoró el dolor con la nitroglicerina?', '用了硝酸甘油后疼痛缓解了吗？', 'Nitroglycerin có làm bớt đau không?', 'Gumaan po ba ang sakit dahil sa nitroglycerin?', 'هل خفّف النيتروغليسرين الألم؟', 'Нитроглицерин облегчил боль?', 'ニトログリセリンで痛みは楽になりましたか？'));
+  insertAfter(c, 'Did you feel dizzy or pass out?',
+    PJ('', 'yn', 'Have you ever had a heart attack?', '¿Alguna vez ha tenido un infarto?', '您以前得过心肌梗塞（心脏病发作）吗？', 'Bạn đã từng bị nhồi máu cơ tim chưa?', 'Inatake na po ba kayo sa puso dati?', 'هل أصبت بنوبة قلبية من قبل؟', 'У вас когда-нибудь был инфаркт?', '心筋梗塞（心臓発作）を起こしたことはありますか？'),
+    PJ('', 'yn', 'Have you had heart surgery, stents, or bypass surgery?', '¿Le han hecho cirugía del corazón, le han puesto stents o un bypass?', '您做过心脏手术、放过支架或做过搭桥手术吗？', 'Bạn đã từng phẫu thuật tim, đặt stent hoặc mổ bắc cầu chưa?', 'Naoperahan na po ba kayo sa puso, nalagyan ng stent, o nag-bypass surgery?', 'هل أجريت عملية في القلب أو تركيب دعامات أو عملية مجازة (بايباس)؟', 'Вам делали операцию на сердце, ставили стенты или шунтирование?', '心臓の手術、ステント、またはバイパス手術を受けたことはありますか？'),
+    { ...CHF },
+    PJ('', 'yn', 'Do you have an irregular heartbeat (arrhythmia)?', '¿Tiene arritmia (latidos irregulares del corazón)?', '您有心律不齐吗？', 'Bạn có bị loạn nhịp tim không?', 'Iregular po ba ang tibok ng puso ninyo (arrhythmia)?', 'هل لديك عدم انتظام في ضربات القلب؟', 'У вас нарушение сердечного ритма (аритмия)?', '不整脈はありますか？'),
+    PJ('', 'yn', 'Have you ever had a dangerous fast heart rhythm, like V-fib or V-tach?', '¿Alguna vez ha tenido un ritmo cardíaco rápido y peligroso, como fibrilación o taquicardia ventricular?', '您以前有过危险的快速心律吗？比如室颤或室速？', 'Bạn đã từng bị nhịp tim nhanh nguy hiểm như rung thất hoặc nhịp nhanh thất chưa?', 'Nagkaroon na po ba kayo ng mapanganib na mabilis na tibok ng puso, tulad ng V-fib o V-tach?', 'هل أصبت من قبل بنظم قلب سريع وخطير، مثل الرجفان البطيني أو تسرّع القلب البطيني؟', 'У вас когда-нибудь был опасный учащённый ритм сердца, например фибрилляция или тахикардия желудочков?', '心室細動や心室頻拍など、危険な速い不整脈を起こしたことはありますか？'));
+}
+
+/* ---- Breathing: COPD, CHF, recent illness, pneumonia, mucus color, pain ---- */
+{
+  const b = catById('breathing').phrases;
+  insertAfter(b, 'Do you use oxygen at home?',
+    PJ('', 'yn', 'Do you have COPD, emphysema, or chronic bronchitis?', '¿Tiene EPOC, enfisema o bronquitis crónica?', '您有慢阻肺、肺气肿或慢性支气管炎吗？', 'Bạn có bị bệnh phổi tắc nghẽn mạn tính (COPD), khí phế thũng hoặc viêm phế quản mạn không?', 'May COPD, emphysema, o chronic bronchitis po ba kayo?', 'هل لديك مرض الانسداد الرئوي المزمن أو انتفاخ الرئة أو التهاب الشعب الهوائية المزمن؟', 'У вас ХОБЛ, эмфизема или хронический бронхит?', 'COPD（慢性閉塞性肺疾患）、肺気腫、または慢性気管支炎はありますか？'),
+    { ...CHF },
+    PJ('', 'yn', 'Have you been sick recently, like a cold or the flu?', '¿Ha estado enfermo recientemente, como con un resfriado o gripe?', '您最近生过病吗？比如感冒或流感？', 'Gần đây bạn có bị bệnh không, như cảm lạnh hoặc cúm?', 'Nagkasakit po ba kayo kamakailan, tulad ng sipon o trangkaso?', 'هل كنت مريضاً مؤخراً، مثل نزلة برد أو إنفلونزا؟', 'Вы недавно болели, например простудой или гриппом?', '最近、風邪やインフルエンザなどで具合が悪かったですか？'),
+    PJ('', 'yn', 'Have you ever had pneumonia?', '¿Alguna vez ha tenido neumonía (pulmonía)?', '您得过肺炎吗？', 'Bạn đã từng bị viêm phổi chưa?', 'Nagkaroon na po ba kayo ng pulmonya?', 'هل أصبت بالتهاب رئوي من قبل؟', 'У вас когда-нибудь была пневмония?', '肺炎になったことはありますか？'));
+  insertAfter(b, 'Do you have a cough?',
+    PJ('', 'color', 'Are you coughing up mucus? Tap its color.', '¿Está sacando flema al toser? Toque el color.', '您咳痰吗？请点击痰的颜色。', 'Bạn có ho ra đờm không? Hãy chạm vào màu của đờm.', 'May plema po ba kapag umuubo kayo? Pindutin ang kulay nito.', 'هل يخرج بلغم مع السعال؟ اضغط على لونه.', 'Вы откашливаете мокроту? Нажмите на её цвет.', 'せきでたんが出ますか？たんの色をタップしてください。'),
+    PJ('', 'yn', 'Does it hurt when you breathe?', '¿Le duele al respirar?', '呼吸时会疼吗？', 'Bạn có đau khi thở không?', 'Masakit po ba kapag humihinga kayo?', 'هل يؤلمك التنفس؟', 'Вам больно дышать?', '息をすると痛みますか？'));
+}
