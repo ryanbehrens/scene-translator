@@ -84,7 +84,7 @@ main{position:relative;z-index:1;padding:12px 14px calc(96px + var(--sab));max-w
 .phrase .tr{color:var(--muted);font-size:17px;margin-top:4px}
 .group-h{font-size:14px!important}
 .pill{display:block;width:fit-content;margin-top:8px;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
-.pill.yn{color:var(--blue)}.pill.color{color:#c084fc}.pill.scale{color:var(--warn)}.pill.open,.pill.point{color:var(--ok)}
+.pill.yn{color:var(--blue)}.pill.color{color:#c084fc}.pill.choice{color:var(--blue)}.pill.scale{color:var(--warn)}.pill.open,.pill.point{color:var(--ok)}
 
 /* Bottom tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);
@@ -121,6 +121,9 @@ main{position:relative;z-index:1;padding:12px 14px calc(96px + var(--sab));max-w
 .yn button small{font-size:13px;font-weight:600;opacity:.85}
 .yn .y{background:var(--ok)}.yn .n{background:var(--bad)}
 .yn .u{grid-column:1 / -1;min-height:62px;font-size:20px;background:var(--surface2);color:var(--text);border:1px solid var(--line)}
+.choices{display:grid;gap:8px}
+.choices button{min-height:62px;padding:10px 16px;border-radius:14px;border:1px solid var(--line);background:var(--surface);text-align:left;font-weight:750;font-size:20px;display:flex;flex-direction:column;justify-content:center}
+.choices button small{font-weight:600;font-size:13px;color:var(--muted)}
 .colors{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .colors button{display:flex;align-items:center;gap:10px;min-height:62px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);text-align:left}
 .colors .sw{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
@@ -353,10 +356,10 @@ a.btn{color:var(--text);text-decoration:none}
 </div>
 <div id="toast" role="status"></div>
 
-<script src="phrases.js?v=5"></script>
+<script src="phrases.js?v=6"></script>
 <script>
 "use strict";
-const APP_VERSION = '2.5';
+const APP_VERSION = '2.6';
 // Support link shown quietly in Settings → About. Leave empty ('') to hide it (e.g. for a department version).
 const SUPPORT_URL = 'https://paypal.me/RBehrens42';
 /* ---------- Languages ---------- */
@@ -400,7 +403,7 @@ function toast(msg, ms = 3200){ const t = $('#toast'); t.textContent = msg; t.cl
 const L = () => langBy(S.lang);
 const ICON_LIST = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/></svg>';
 const AO_LBL = { '1':'Pe', '2':'Pl', '3':'Ti', '4':'Ev' };
-const TYPE_LBL = { yn:'Yes / No', scale:'0–10', open:'Spoken', point:'Point', instr:'Instruction', color:'Tap color' };
+const TYPE_LBL = { yn:'Yes / No', scale:'0–10', open:'Spoken', point:'Point', instr:'Instruction', color:'Tap color', choice:'Tap answer' };
 
 /* ---------- Translation services ---------- */
 const chromeTranslators = {};
@@ -812,6 +815,10 @@ function renderSheet(){
     const col = n => `hsl(${120 - n * 12},70%,${n > 5 ? 44 : 38}%)`;
     a.innerHTML = `<h3>Patient taps a number</h3><div class="scale">${Array.from({ length:11 }, (_, n) => `<button data-ans="${n}" style="background:${col(n)}">${n}</button>`).join('')}</div>
       <div class="scale-legend"><span>0 = ${esc(uiOf('nopain', lc) || 'No pain')}</span><span>10 = ${esc(uiOf('worst', lc) || 'Worst pain')}</span></div>`;
+  } else if (p.type === 'choice') {
+    a.innerHTML = `<h3>Patient taps an answer</h3><div class="choices">${(p.choices || []).map(k =>
+      `<button data-ans="${k}"><span dir="${dir}">${esc(uiOf(k, lc) || UI_TR[k].en)}</span>${uiOf(k, lc) && uiOf(k, lc) !== UI_TR[k].en ? `<small>${UI_TR[k].en}</small>` : ''}</button>`).join('')}</div>
+      <button class="btn block" style="margin-top:10px" data-listen>🎤 Or listen to a spoken answer</button><div class="lb"></div>`;
   } else if (p.type === 'color') {
     const sw = [['c_none','transparent'],['c_clear','#dbeafe'],['c_white','#f8fafc'],['c_yellow','#facc15'],['c_green','#65a30d'],['c_brown','#92400e'],['c_blood','#b91c1c'],['c_pink','#f9a8d4']];
     a.innerHTML = `<h3>Patient taps the color</h3><div class="colors">${sw.map(([k, c]) =>
@@ -992,7 +999,8 @@ function init(){
   $('#sAnswer').addEventListener('click', e => {
     const ans = e.target.closest('[data-ans]');
     if (ans) { const v = ans.dataset.ans;
-      recordAnswer(/^\d+$/.test(v) ? 'Pain ' + v + ' / 10' : v.startsWith('c_') ? 'Mucus: ' + UI_TR[v].en : UI_TR[v].en.toUpperCase()); return; }
+      recordAnswer(/^\d+$/.test(v) ? 'Pain ' + v + ' / 10' : v.startsWith('c_') ? 'Mucus: ' + UI_TR[v].en
+        : /^(yes|no|unsure)$/.test(v) && curP().p.type === 'yn' ? UI_TR[v].en.toUpperCase() : UI_TR[v].en); return; }
     const li = e.target.closest('[data-listen]'); if (li) { sheetListen(li); return; }
     if (e.target.id === 'pointSave') { const v = $('#pointNote').value.trim(); if (v) recordAnswer('Points to: ' + v); }
   });

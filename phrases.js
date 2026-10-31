@@ -405,3 +405,46 @@ catById('trauma').phrases.unshift(...aoCopy());
 replacePhrase(catById('basics').phrases, 'Where does it hurt? Point to it.',
   PJ('', 'yn', 'Are you having any pain?', '¿Tiene algún dolor?', '您有哪里疼吗？', 'Bạn có bị đau ở đâu không?', 'May nararamdaman po ba kayong sakit?', 'هل تشعر بأي ألم؟', 'У вас что-нибудь болит?', 'どこか痛みはありますか？'),
   PJ('', 'point', 'Where are you having pain? Point to it.', '¿Dónde tiene el dolor? Señálelo.', '您哪里疼？请指给我看。', 'Bạn đau ở đâu? Hãy chỉ cho tôi.', 'Saan po kayo may nararamdamang sakit? Ituro po ninyo.', 'أين تشعر بالألم؟ أشر إلى المكان.', 'Где у вас болит? Покажите, пожалуйста.', 'どこが痛いですか？指でさしてください。'));
+
+/* ---- v2.6: Shortness of breath, illness respiratory items, trauma additions ---- */
+Object.assign(UI_TR, {
+  f_trip:  { en: 'I tripped', es: 'Me tropecé', zh: '我绊倒了', vi: 'Tôi bị vấp', tl: 'Natisod ako', ar: 'تعثرت', ru: 'Я споткнулся(-ась)', ja: 'つまずいた' },
+  f_dizzy: { en: 'I felt dizzy', es: 'Me mareé', zh: '我头晕', vi: 'Tôi bị chóng mặt', tl: 'Nahilo ako', ar: 'شعرت بدوار', ru: 'У меня закружилась голова', ja: 'めまいがした' },
+  f_out:   { en: 'I passed out', es: 'Me desmayé', zh: '我昏倒了', vi: 'Tôi bị ngất', tl: 'Nawalan ako ng malay', ar: 'أغمي عليّ', ru: 'Я потерял(а) сознание', ja: '気を失った' },
+});
+const HOME_TX = PJ('', 'yn', 'Have you tried your usual home treatment yet?', '¿Ya probó el tratamiento que usa en casa?', '您已经用过平时在家用的治疗方法了吗？', 'Bạn đã thử cách điều trị thường dùng ở nhà chưa?', 'Nasubukan na po ba ninyo ang karaniwan ninyong gamutan sa bahay?', 'هل جربت العلاج الذي تستخدمه عادة في المنزل؟', 'Вы уже попробовали лечение, которое обычно используете дома?', 'いつも家で使っている治療（薬など）はもう試しましたか？');
+const DID_HELP = PJ('', 'yn', 'Did it help?', '¿Le ayudó?', '有帮助吗？', 'Nó có giúp được không?', 'Nakatulong po ba ito?', 'هل ساعدك ذلك؟', 'Это помогло?', '効きましたか？');
+const ALBUTEROL = PJ('', 'yn', 'Do you have a prescribed albuterol inhaler or nebulizer?', '¿Tiene un inhalador de albuterol o un nebulizador recetado?', '您有医生开的沙丁胺醇吸入器或雾化器吗？', 'Bạn có ống hít albuterol hoặc máy xông khí dung được kê đơn không?', 'May niresetang albuterol inhaler o nebulizer po ba kayo?', 'هل لديك بخاخ ألبوتيرول أو جهاز تبخيرة موصوف لك؟', 'У вас есть назначенный врачом ингалятор с альбутеролом (сальбутамолом) или небулайзер?', '処方されたアルブテロール（サルブタモール）の吸入器やネブライザーはありますか？');
+const BREATH_TX = PJ('', 'instr', 'We are going to give you a breathing treatment.', 'Le vamos a dar un tratamiento para ayudarle a respirar.', '我们要给您做雾化治疗，帮助您呼吸。', 'Chúng tôi sẽ cho bạn xông thuốc để giúp bạn dễ thở.', 'Bibigyan po namin kayo ng gamutan para makahinga kayo nang maayos.', 'سنعطيك علاجاً بالتبخيرة لمساعدتك على التنفس.', 'Сейчас мы проведём вам ингаляцию, чтобы облегчить дыхание.', '呼吸を楽にするための吸入治療をします。');
+
+/* Shortness of Breath (renamed from Breathing / Respiratory) */
+{
+  const sob = catById('breathing'); sob.name = 'Shortness of Breath';
+  insertAfter(sob.phrases, 'Do you use an inhaler? Where is it?', { ...ALBUTEROL }, { ...HOME_TX }, { ...DID_HELP });
+  insertAfter(sob.phrases, 'This mask will give you oxygen. Breathe normally.', { ...BREATH_TX });
+}
+
+/* Illness: cough + mucus color, home treatment, albuterol, breathing treatment */
+catById('illness').phrases.push(
+  REF('Do you have a cough?'), REF('Are you coughing up mucus? Tap its color.'),
+  { ...HOME_TX }, { ...DID_HELP }, { ...ALBUTEROL }, { ...BREATH_TX });
+
+/* Trauma */
+{
+  const t = catById('trauma').phrases;
+  // pain check right after A&O
+  const afterAO = t.findIndex(p => !/^[1-4]$/.test(p.tag || ''));
+  t.splice(afterAO, 0, REF('Are you having any pain?'), REF('Where are you having pain? Point to it.'));
+  insertAfter(t, 'Did you fall?',
+    { ...PJ('', 'choice', 'When you fell, did you trip, or did you fall because you felt dizzy or passed out?', 'Cuando se cayó, ¿se tropezó, o se cayó porque se mareó o se desmayó?', '您摔倒时，是绊倒的，还是因为头晕或昏倒才摔倒的？', 'Khi bạn ngã, bạn bị vấp, hay bạn ngã vì chóng mặt hoặc ngất xỉu?', 'Nang matumba po kayo, natisod ba kayo, o natumba dahil nahilo o nawalan ng malay?', 'عندما سقطت، هل تعثرت، أم سقطت لأنك شعرت بدوار أو أغمي عليك؟', 'Когда вы упали, вы споткнулись или упали из-за головокружения или потери сознания?', '転んだとき、つまずいたのですか？それとも、めまいがしたり気を失ったりして倒れたのですか？'),
+      choices: ['f_trip', 'f_dizzy', 'f_out', 'unsure'] });
+  insertAfter(t, 'Did you pass out?',
+    PJ('', 'yn', 'Did you lose consciousness?', '¿Perdió el conocimiento en algún momento?', '您有没有失去知觉？', 'Bạn có bị mất ý thức không?', 'Nawalan po ba kayo ng ulirat?', 'هل فقدت وعيك؟', 'Вы были без сознания?', '意識を失いましたか？'));
+  // Spinal check, then collar
+  insertAfter(t, 'Do not move your head.',
+    PJ('', 'instr', 'Slowly look up, then left, then right. Stop if you feel any pain.', 'Mire despacio hacia arriba, luego a la izquierda y luego a la derecha. Deténgase si siente dolor.', '请慢慢向上看，然后向左看，再向右看。如果感到疼痛就停下来。', 'Hãy từ từ nhìn lên, rồi nhìn sang trái, rồi sang phải. Dừng lại nếu bạn thấy đau.', 'Dahan-dahan po kayong tumingin pataas, tapos sa kaliwa, tapos sa kanan. Huminto kung may maramdamang sakit.', 'انظر ببطء إلى الأعلى، ثم إلى اليسار، ثم إلى اليمين. توقف إذا شعرت بأي ألم.', 'Медленно посмотрите вверх, затем влево, затем вправо. Остановитесь, если почувствуете боль.', 'ゆっくり上を見て、次に左、次に右を見てください。痛みを感じたら止めてください。'),
+    PJ('', 'instr', 'We are going to put a collar around your neck to keep your head still.', 'Le vamos a poner un collarín en el cuello para mantener la cabeza inmóvil.', '我们要给您戴上颈托，固定您的头部。', 'Chúng tôi sẽ đeo nẹp cổ cho bạn để giữ đầu bạn không cử động.', 'Lalagyan po namin ng collar ang leeg ninyo para hindi gumalaw ang ulo ninyo.', 'سنضع طوقاً حول رقبتك لتثبيت رأسك.', 'Мы наденем вам на шею воротник, чтобы зафиксировать голову.', '頭が動かないように、首にカラー（固定具）を着けます。'));
+  insertAfter(t, 'Were you wearing a seatbelt?',
+    PJ('', 'open', 'How fast were you driving?', '¿A qué velocidad iba manejando?', '您当时开车的速度有多快？', 'Lúc đó bạn lái xe nhanh bao nhiêu?', 'Gaano po kabilis ang pagmamaneho ninyo?', 'ما السرعة التي كنت تقود بها؟', 'С какой скоростью вы ехали?', 'どのくらいのスピードで運転していましたか？'));
+  t.push(PJ('', 'yn', 'We would like to take you to the hospital. Do we have your permission to transport you?', 'Nos gustaría llevarle al hospital. ¿Nos da permiso para trasladarle?', '我们想送您去医院。您同意让我们送您去吗？', 'Chúng tôi muốn đưa bạn đến bệnh viện. Bạn có đồng ý để chúng tôi chở bạn đi không?', 'Gusto po namin kayong dalhin sa ospital. Pumapayag po ba kayong dalhin namin kayo?', 'نود نقلك إلى المستشفى. هل تسمح لنا بنقلك؟', 'Мы хотели бы отвезти вас в больницу. Вы разрешаете нам вас отвезти?', '病院へお連れしたいと思います。搬送してもよろしいですか？'));
+}
