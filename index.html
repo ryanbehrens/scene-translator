@@ -335,7 +335,7 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 <script src="phrases.js?v=4"></script>
 <script>
 "use strict";
-const APP_VERSION = '1.7';
+const APP_VERSION = '1.8';
 /* ---------- Languages ---------- */
 const EN = { c:'en', name:'English', sr:'en-US', tts:['en-US','en'], mm:'en', lt:['en'] };
 const LANGS = [
@@ -485,21 +485,58 @@ async function watchMic(){
   try { const ps = await navigator.permissions.query({ name:'microphone' }); setMicState(ps.state); ps.onchange = () => setMicState(ps.state); }
   catch { setMicState('unknown'); }
 }
+const UA = navigator.userAgent;
+const IS_CHROME_IOS = /CriOS/i.test(UA);
+const IS_MAC = /Macintosh/i.test(UA) && !IS_IOS;
+const IS_WIN = /Windows/i.test(UA);
+const IS_CHROME = /Chrome|CriOS/i.test(UA) && !/Edg\//i.test(UA);
+let lastMicMsg = '';
+function deviceName(){
+  if (IS_CHROME_IOS) return 'Chrome on iPhone';
+  if (IS_IOS) return 'Safari on iPhone';
+  if (IS_ANDROID) return 'Chrome on Android';
+  if (IS_MAC) return (IS_CHROME ? 'Chrome' : 'Browser') + ' on Mac';
+  if (IS_WIN) return (IS_CHROME ? 'Chrome' : 'Browser') + ' on Windows';
+  return 'this browser';
+}
 function micStepsHTML(){
-  const host = location.host || 'this site';
-  const ios = `<h4>iPhone</h4><ol>
-    <li>In Safari, tap the <b>aA</b> (or page settings) button at the left of the address bar.</li>
-    <li>Tap <b>Website Settings</b> → <b>Microphone</b> → choose <b>Allow</b>.</li>
-    <li>Choosing <b>Allow</b> (not "Ask") stops it from asking again after every refresh.</li></ol>
-    <p class="small">Opened from the home-screen icon? Use the iPhone <b>Settings</b> app → <b>Apps</b> → <b>Safari</b> → <b>Microphone</b> → <b>Allow</b>.</p>
-    <p class="small">Still blocked? Settings → General → Keyboard → turn on <b>Enable Dictation</b> (needed for speech recognition), and Settings → Screen Time → Content & Privacy Restrictions → Microphone must be allowed.</p>`;
-  const android = `<h4>Android (Chrome)</h4><ol>
-    <li>Tap the icon at the left of the address bar (it looks like sliders or a lock).</li>
-    <li>Tap <b>Permissions</b> → <b>Microphone</b> → <b>Allow</b>, then reload the page.</li></ol>
-    <p class="small">Installed as an app? Long-press the Scene Translator icon → <b>App info</b> → <b>Permissions</b> → <b>Microphone</b> → <b>Allow</b>.</p>
-    <p class="small">Also check Android Settings → Apps → Chrome → Permissions → Microphone is allowed.</p>`;
-  const other = `<h4>Desktop browser</h4><ol><li>Click the icon at the left of the address bar for <b>${esc(host)}</b>.</li><li>Set <b>Microphone</b> to <b>Allow</b> and reload.</li></ol>`;
-  return IS_IOS ? ios : IS_ANDROID ? android : ios + android + other;
+  const host = esc(location.host || 'this site');
+  const sysBlocked = /system/i.test(lastMicMsg);   // Chrome says "Permission denied by system" when the phone/computer itself blocks Chrome
+  let h = `<p class="small">Detected: <b>${deviceName()}</b></p>`;
+  if (IS_CHROME_IOS) {
+    h += `<h4>Chrome on iPhone</h4><ol>
+      <li>Open the iPhone <b>Settings</b> app → <b>Apps</b> → <b>Chrome</b> → turn <b>Microphone</b> on.</li>
+      <li>Come back to Chrome, reload the page, and tap <b>Allow microphone</b>. Choose <b>Allow</b> when Chrome asks.</li></ol>
+      <p class="small"><b>Tip:</b> On iPhone, listening to the patient works best in <b>Safari</b>. Chrome on iPhone may not support speech recognition at all. Open <b>${host}</b> in Safari and add it to your home screen from there.</p>`;
+  } else if (IS_IOS) {
+    h += `<h4>Safari on iPhone</h4><ol>
+      <li>Tap the <b>aA</b> (or page settings) button at the left of the address bar.</li>
+      <li>Tap <b>Website Settings</b> → <b>Microphone</b> → <b>Allow</b>.</li></ol>
+      <p class="small">Opened from the home-screen icon? iPhone <b>Settings</b> → <b>Apps</b> → <b>Safari</b> → <b>Microphone</b> → <b>Allow</b>.</p>
+      <p class="small">Still blocked? Settings → General → Keyboard → turn on <b>Enable Dictation</b>.</p>`;
+  } else if (IS_ANDROID) {
+    h += sysBlocked ? `<h4>Android is blocking Chrome</h4><ol>
+      <li>Open Android <b>Settings</b> → <b>Apps</b> → <b>Chrome</b> → <b>Permissions</b> → <b>Microphone</b> → <b>Allow</b>.</li>
+      <li>Come back and tap <b>Allow microphone</b> again.</li></ol>` : '';
+    h += `<h4>Chrome is blocking this site</h4><ol>
+      <li>Tap the icon at the left of the address bar (sliders or a lock).</li>
+      <li>Tap <b>Permissions</b> (or <b>Site settings</b>) → <b>Microphone</b> → <b>Allow</b>. If you see <b>Reset permissions</b>, tap it.</li>
+      <li>Reload the page and tap <b>Allow microphone</b>.</li></ol>
+      <p class="small">Installed as an app? Long-press the Scene Translator icon → <b>App info</b> → <b>Permissions</b> → <b>Microphone</b> → <b>Allow</b>.</p>`;
+    if (!sysBlocked) h += `<p class="small">Still blocked? Android <b>Settings</b> → <b>Apps</b> → <b>Chrome</b> → <b>Permissions</b> → <b>Microphone</b> must be <b>Allow</b>. Also check that the microphone isn't turned off in the quick-settings panel (swipe down from the top).</p>`;
+  } else {
+    h += `<h4>Chrome is blocking this site</h4><ol>
+      <li>Click the icon at the left of the address bar for <b>${host}</b>.</li>
+      <li>Turn <b>Microphone</b> on (or click <b>Site settings</b> → <b>Microphone</b> → <b>Allow</b>).</li>
+      <li>Reload the page.</li></ol>`;
+    if (IS_MAC) h += `<h4>${sysBlocked ? 'Your Mac is blocking Chrome' : 'If it\'s still blocked: your Mac'}</h4><ol>
+      <li>Apple menu → <b>System Settings</b> → <b>Privacy &amp; Security</b> → <b>Microphone</b>.</li>
+      <li>Turn on <b>Google Chrome</b>, then quit and reopen Chrome.</li></ol>`;
+    if (IS_WIN) h += `<h4>${sysBlocked ? 'Windows is blocking Chrome' : 'If it\'s still blocked: Windows'}</h4><ol>
+      <li><b>Settings</b> → <b>Privacy &amp; security</b> → <b>Microphone</b>.</li>
+      <li>Turn on <b>Microphone access</b> and <b>Let desktop apps access your microphone</b>, then restart Chrome.</li></ol>`;
+  }
+  return h;
 }
 function showMicHelp(msg){
   $('#micHelpMsg').textContent = msg || 'The microphone is blocked for this app. Tap "Allow microphone". If no pop-up appears, follow the steps below once.';
@@ -517,10 +554,12 @@ async function requestMic(){
     st.getTracks().forEach(t => t.stop());
     setMicState('granted'); return true;
   } catch (e) {
-    lastMicErr = e.name || 'Error';
+    lastMicErr = e.name || 'Error'; lastMicMsg = e.message || '';
     if (e.name === 'NotFoundError') { showMicHelp('No microphone was found on this device.'); return false; }
     setMicState('denied');
-    showMicHelp('The phone didn\'t allow the microphone. It won\'t show the pop-up again until you allow it in settings. Follow these steps once:');
+    showMicHelp(/system/i.test(lastMicMsg)
+      ? 'Your ' + (IS_ANDROID || IS_IOS ? 'phone' : 'computer') + ' is blocking Chrome from using the microphone. Turn it on in the device settings below:'
+      : 'The microphone is blocked for this site. It won\'t show the pop-up again until you allow it. Follow these steps once:');
     return false;
   }
 }
@@ -533,7 +572,7 @@ function stopListening(){ if (rec) rec.finish(); }
    So we: keep the latest words heard, auto-finish after ~2s of silence, give up after 10s of no speech,
    cap at 30s, and force-finish if the browser never reports that it stopped. */
 function listen(langC, { onInterim, onDone, onError }){
-  if (!SR) { onError('Speech recognition is not supported in this browser. Use Safari on iPhone or Chrome on Android.'); onDone('', true); return; }
+  if (!SR) { onError(IS_CHROME_IOS ? 'Chrome on iPhone can\'t listen to speech. Open this app in Safari instead.' : 'Speech recognition is not supported in this browser. Use Safari on iPhone or Chrome on Android.'); onDone('', true); return; }
   if (rec) { rec.finish(); return; }
   if (micState === 'denied') { showMicHelp(); onDone('', true); return; }
   try { speechSynthesis.cancel(); } catch {}
@@ -869,7 +908,8 @@ function init(){
     // Phone refused without a pop-up: say so clearly and point to the steps
     btn.textContent = 'Still blocked — tap to try again';
     $('#micHelpMsg').innerHTML = '<b style="color:var(--bad)">Your phone blocked the microphone without asking.</b> That means it has to be turned on in your phone\'s settings. Follow the steps below, then come back and tap the button again.' +
-      (lastMicErr ? ' <span style="opacity:.7">(' + esc(lastMicErr) + ')</span>' : '');
+      (lastMicErr ? ' <span style="opacity:.7">(' + esc(lastMicErr + (lastMicMsg ? ': ' + lastMicMsg : '')) + ')</span>' : '');
+    $('#micSteps').innerHTML = micStepsHTML();
     const st = $('#micSteps'); st.classList.remove('flash'); void st.offsetWidth; st.classList.add('flash');
     $('#micHelp .modal-box').scrollTo({ top:0, behavior:'smooth' });
     if (navigator.vibrate) try { navigator.vibrate([40, 60, 40]); } catch {}
