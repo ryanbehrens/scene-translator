@@ -34,8 +34,8 @@ button{cursor:pointer}
   padding:calc(10px + var(--sat)) 16px 10px;background:linear-gradient(120deg,var(--hdr1),var(--hdr2));color:#fff;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 2px 12px rgba(0,0,0,.25)}
 .top .brand p{color:rgba(255,255,255,.78)!important}
 .top .icon-btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:#fff}
-/* Star of Life watermark: soft overlay, never blocks taps */
-body::after{content:"";position:fixed;inset:0;z-index:15;pointer-events:none;opacity:.07;
+/* Star of Life watermark: sits behind all content (cards cover it), never blocks taps */
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.07;
   background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2092.64%2096.3%22%3E%3Cpath%20fill%3D%22%23aab4c3%22%20d%3D%22M57.2%2C96.29h-22.02c-1.39-.09-2.42-1.07-2.42-2.5v-22.26s-18.45%2C10.88-18.45%2C10.88c-1.08.64-2.47.03-3.08-1.02L.47%2C62.81c-.67-1.16-.65-2.38.42-3.26l8.02-4.78%2C11.21-6.58L.91%2C36.75c-1.13-.67-1.09-2.13-.52-3.12L11.21%2C14.9c.66-1.15%2C2.12-1.43%2C3.24-.78l18.29%2C10.59V2.71c0-1.45.84-2.44%2C2.3-2.7h22.29c1.69.07%2C2.59%2C1.28%2C2.59%2C2.9v21.81s18.31-10.63%2C18.31-10.63c.9-.52%2C2.4-.43%2C2.96.53l11.07%2C19.08c.62.99.49%2C2.42-.63%2C3.09l-19.13%2C11.38%2C18.94%2C11.17c1.19.7%2C1.48%2C2.1.81%2C3.27l-10.73%2C18.6c-.43.74-1.01%2C1.24-1.58%2C1.36-.97.2-1.57-.08-2.33-.53l-17.69-10.45-.07%2C22.31c0%2C1.45-1.3%2C2.44-2.66%2C2.39Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M43.57%2C69.03c-2.1-.76-4.06-2.13-5.14-4.18-1.43-2.72-1.12-6.19.7-8.62%2C1.33-1.78%2C3.15-2.85%2C5.25-3.45l6.28-1.8c1.74-.5%2C2.81-2.3%2C2.2-4.11-.32-.96-1.22-1.58-2.21-2.02.88-1.68%2C1.34-3.36%2C1.4-5.39%2C4.99%2C1.95%2C7.42%2C7.06%2C5.43%2C11.81-.87%2C2.07-2.89%2C4.06-5.44%2C4.67l-5.38%2C1.28c-1.42.34-2.47%2C1.05-3.44%2C2.1-1.07%2C1.16-1.2%2C2.78-.04%2C3.97l1.12%2C1.14c-.64%2C1.45-.71%2C2.72-.74%2C4.61Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M49.9%2C49.6l-4.9%2C1.31-.62-20.39c2-1.13%2C4.11-1.51%2C5.98-.23l-.46%2C19.31Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M45.99%2C85.82l-.32-4.12c-1.25.68-2.45%2C1.26-3.08.57-.96-1.06.99-3.61%2C3.64-4.77%2C2.12-.92%2C4.45-1.71%2C4.74-3.72.13-.89-.39-1.58-.85-2.24.64-1.27%2C1.04-2.68%2C1.15-4.2%2C1.04.73%2C1.97%2C1.49%2C2.67%2C2.5%2C1.9%2C2.71%2C1.23%2C6.3-1.21%2C8.46-1.01.9-2.16%2C1.39-3.41%2C1.88l-.25%2C4.36c-.06%2C1.07-.5%2C2.35-1.63%2C2.66-.63.18-1.42-.71-1.47-1.38Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M48.57%2C74.47l-2.98%2C1.83-.39-16.46c1.42-1.04%2C2.85-1.66%2C4.6-1.97l-.47%2C17.18c-.3-.1-.44-.31-.76-.58Z%22/%3E%3Cpath%20fill%3D%22%230b1220%22%20d%3D%22M41.93%2C29.85c-1.3%2C1.04-1.8%2C2.77-1.2%2C4.1s1.74%2C1.97%2C2.86%2C2.56c-.8%2C1.79-.83%2C3.56-.52%2C5.5-3.09-.67-5.48-2.55-6.92-5.26-1.6-3.69-.85-8.04%2C2.1-10.79%2C1.73-1.61%2C3.8-2.53%2C6.08-2.98l-.32-9.44c-.07-2.12%2C1.81-3.82%2C3.89-3.49%2C1.66.26%2C2.87%2C1.81%2C2.82%2C3.48l-.27%2C9.18c3.23-.6%2C5.85-.6%2C7.95%2C1.83.73.84.6%2C1.93-.06%2C2.77-1.61%2C1.59-3.85%2C2.39-6.11%2C1.85-3.22-1.75-7.38-1.65-10.3.69Z%22/%3E%3Ccircle%20fill%3D%22%230b1220%22%20cx%3D%2254.59%22%20cy%3D%2224.87%22%20r%3D%22.69%22/%3E%3C/svg%3E") center 58% / min(80vw,460px) no-repeat}
 [data-theme="light"] body::after{opacity:.06;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2092.64%2096.3%22%3E%3Cpath%20fill%3D%22%23334155%22%20d%3D%22M57.2%2C96.29h-22.02c-1.39-.09-2.42-1.07-2.42-2.5v-22.26s-18.45%2C10.88-18.45%2C10.88c-1.08.64-2.47.03-3.08-1.02L.47%2C62.81c-.67-1.16-.65-2.38.42-3.26l8.02-4.78%2C11.21-6.58L.91%2C36.75c-1.13-.67-1.09-2.13-.52-3.12L11.21%2C14.9c.66-1.15%2C2.12-1.43%2C3.24-.78l18.29%2C10.59V2.71c0-1.45.84-2.44%2C2.3-2.7h22.29c1.69.07%2C2.59%2C1.28%2C2.59%2C2.9v21.81s18.31-10.63%2C18.31-10.63c.9-.52%2C2.4-.43%2C2.96.53l11.07%2C19.08c.62.99.49%2C2.42-.63%2C3.09l-19.13%2C11.38%2C18.94%2C11.17c1.19.7%2C1.48%2C2.1.81%2C3.27l-10.73%2C18.6c-.43.74-1.01%2C1.24-1.58%2C1.36-.97.2-1.57-.08-2.33-.53l-17.69-10.45-.07%2C22.31c0%2C1.45-1.3%2C2.44-2.66%2C2.39Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M43.57%2C69.03c-2.1-.76-4.06-2.13-5.14-4.18-1.43-2.72-1.12-6.19.7-8.62%2C1.33-1.78%2C3.15-2.85%2C5.25-3.45l6.28-1.8c1.74-.5%2C2.81-2.3%2C2.2-4.11-.32-.96-1.22-1.58-2.21-2.02.88-1.68%2C1.34-3.36%2C1.4-5.39%2C4.99%2C1.95%2C7.42%2C7.06%2C5.43%2C11.81-.87%2C2.07-2.89%2C4.06-5.44%2C4.67l-5.38%2C1.28c-1.42.34-2.47%2C1.05-3.44%2C2.1-1.07%2C1.16-1.2%2C2.78-.04%2C3.97l1.12%2C1.14c-.64%2C1.45-.71%2C2.72-.74%2C4.61Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M49.9%2C49.6l-4.9%2C1.31-.62-20.39c2-1.13%2C4.11-1.51%2C5.98-.23l-.46%2C19.31Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M45.99%2C85.82l-.32-4.12c-1.25.68-2.45%2C1.26-3.08.57-.96-1.06.99-3.61%2C3.64-4.77%2C2.12-.92%2C4.45-1.71%2C4.74-3.72.13-.89-.39-1.58-.85-2.24.64-1.27%2C1.04-2.68%2C1.15-4.2%2C1.04.73%2C1.97%2C1.49%2C2.67%2C2.5%2C1.9%2C2.71%2C1.23%2C6.3-1.21%2C8.46-1.01.9-2.16%2C1.39-3.41%2C1.88l-.25%2C4.36c-.06%2C1.07-.5%2C2.35-1.63%2C2.66-.63.18-1.42-.71-1.47-1.38Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M48.57%2C74.47l-2.98%2C1.83-.39-16.46c1.42-1.04%2C2.85-1.66%2C4.6-1.97l-.47%2C17.18c-.3-.1-.44-.31-.76-.58Z%22/%3E%3Cpath%20fill%3D%22%23f3f5f9%22%20d%3D%22M41.93%2C29.85c-1.3%2C1.04-1.8%2C2.77-1.2%2C4.1s1.74%2C1.97%2C2.86%2C2.56c-.8%2C1.79-.83%2C3.56-.52%2C5.5-3.09-.67-5.48-2.55-6.92-5.26-1.6-3.69-.85-8.04%2C2.1-10.79%2C1.73-1.61%2C3.8-2.53%2C6.08-2.98l-.32-9.44c-.07-2.12%2C1.81-3.82%2C3.89-3.49%2C1.66.26%2C2.87%2C1.81%2C2.82%2C3.48l-.27%2C9.18c3.23-.6%2C5.85-.6%2C7.95%2C1.83.73.84.6%2C1.93-.06%2C2.77-1.61%2C1.59-3.85%2C2.39-6.11%2C1.85-3.22-1.75-7.38-1.65-10.3.69Z%22/%3E%3Ccircle%20fill%3D%22%23f3f5f9%22%20cx%3D%2254.59%22%20cy%3D%2224.87%22%20r%3D%22.69%22/%3E%3C/svg%3E")}
 .brand{display:flex;align-items:center;gap:10px}
@@ -45,7 +45,7 @@ body::after{content:"";position:fixed;inset:0;z-index:15;pointer-events:none;opa
 .icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
 .icon-btn svg{width:20px;height:20px}
 
-main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
+main{position:relative;z-index:1;padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .view{display:none}.view.active{display:block}
 
 /* Pickers */
@@ -180,6 +180,10 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 .switch input{width:22px;height:22px;accent-color:var(--accent)}
 .small{font-size:15px;color:var(--muted)}
 .small a{color:var(--blue)}
+.support{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+a.btn{color:var(--text);text-decoration:none}
+.support .btn svg{color:var(--accent-text)}
+.support p{margin-top:0}
 .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--muted)}
 .status-dot.ok{background:var(--ok)}.status-dot.bad{background:var(--bad)}
 
@@ -287,6 +291,11 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
       <p class="small">Scene Translator is a communication aid for first responders. It is not a certified medical interpreter. Use a professional interpreter line when one is available, and confirm critical answers (allergies, medications, pregnancy) another way when you can.</p>
       <p class="small"><b>Version <span id="appVer"></span></b></p>
       <p class="small">Built-in phrases: Spanish, Chinese (Mandarin), Vietnamese, Tagalog, Arabic, Russian, Japanese. Other languages use machine translation and need internet.</p>
+          <div id="supportBox" class="support hidden">
+        <p class="small">Scene Translator is free for first responders and always will be. If it has helped you or your crew, you can chip in toward hosting and translation costs.</p>
+        <a id="supportLink" class="btn block" href="#" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Support this project (PayPal)</a>
+      </div>
     </div>
   </section>
 </main>
@@ -347,7 +356,9 @@ main{padding:12px 14px calc(96px + var(--sab));max-width:760px;margin:0 auto}
 <script src="phrases.js?v=4"></script>
 <script>
 "use strict";
-const APP_VERSION = '2.0';
+const APP_VERSION = '2.2';
+// Support link shown quietly in Settings → About. Leave empty ('') to hide it (e.g. for a department version).
+const SUPPORT_URL = '';
 /* ---------- Languages ---------- */
 const EN = { c:'en', name:'English', sr:'en-US', tts:['en-US','en'], mm:'en', lt:['en'] };
 const LANGS = [
@@ -940,6 +951,7 @@ function init(){
     if (ok) toast('Microphone allowed. You\'re ready to listen.', 4000);
   };
   $('#appVer').textContent = APP_VERSION;
+  if (SUPPORT_URL) { $('#supportLink').href = SUPPORT_URL; $('#supportBox').classList.remove('hidden'); }
   applyTheme(); renderPickers(); updateLangLabels(); renderList(); bindSettings(); renderLog();
   $('#langSel').addEventListener('change', e => { S.lang = e.target.value; saveS(); updateLangLabels(); renderList(); });
   $('#catSel').addEventListener('change', e => { S.cat = e.target.value; saveS(); $('#search').value = ''; renderList(); window.scrollTo(0, 0); });
